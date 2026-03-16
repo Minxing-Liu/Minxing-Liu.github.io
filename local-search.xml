@@ -4,6 +4,35 @@
   
   
   <entry>
+    <title>我的博客搭建记录</title>
+    <link href="/2026/03/16/my-blog-setup/"/>
+    <url>/2026/03/16/my-blog-setup/</url>
+    
+    <content type="html"><![CDATA[<h1 id="我的博客终于上线了"><a href="#我的博客终于上线了" class="headerlink" title="我的博客终于上线了"></a>我的博客终于上线了</h1><p>今天我成功搭建了自己的 Hexo 博客，并部署到了 GitHub Pages。</p><h2 id="我用到的技术"><a href="#我用到的技术" class="headerlink" title="我用到的技术"></a>我用到的技术</h2><ul><li>Hexo</li><li>Fluid 主题</li><li>GitHub Pages</li><li>SSH 部署</li></ul><h2 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h2><h3 id="1-HTTPS-推送失败"><a href="#1-HTTPS-推送失败" class="headerlink" title="1. HTTPS 推送失败"></a>1. HTTPS 推送失败</h3><p>一开始用 HTTPS 部署时，出现了认证失败的问题。</p><h3 id="2-SSH-地址写错"><a href="#2-SSH-地址写错" class="headerlink" title="2. SSH 地址写错"></a>2. SSH 地址写错</h3><p>后来改成 SSH 时，把地址格式写错了，导致仓库识别失败。</p><h3 id="3-Pages-分支不一致"><a href="#3-Pages-分支不一致" class="headerlink" title="3. Pages 分支不一致"></a>3. Pages 分支不一致</h3><p>最后发现 GitHub Pages 显示的是 main 分支，而 Hexo 部署到了 master 分支。</p><h2 id="现在已经成功了"><a href="#现在已经成功了" class="headerlink" title="现在已经成功了"></a>现在已经成功了</h2><h2 id="现在网站已经能正常显示-Fluid-主题页面了。"><a href="#现在网站已经能正常显示-Fluid-主题页面了。" class="headerlink" title="现在网站已经能正常显示 Fluid 主题页面了。"></a>现在网站已经能正常显示 Fluid 主题页面了。</h2>]]></content>
+    
+    
+    <categories>
+      
+      <category>博客搭建</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Hexo</tag>
+      
+      <tag>Fluid</tag>
+      
+      <tag>GitHub Pages</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Hello World</title>
     <link href="/2026/03/16/hello-world/"/>
     <url>/2026/03/16/hello-world/</url>
