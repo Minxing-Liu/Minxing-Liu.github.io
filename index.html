@@ -61,7 +61,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"minxing-liu.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"minxing-liu.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":6},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -341,7 +341,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2026/03/16/covariance-correlation-pca-notes/" target="_self">
         <div>
-          协方差矩阵、相关矩阵与 PCA：一份基础知识笔记在数据分析、机器学习和科研中，经常会遇到下面几个概念：  数据矩阵 $X$ 协方差矩阵（covariance matrix） 相关矩阵（correlation matrix） PCA（Principal Component Analysis，主成分分析）  它们经常一起出现，但初学时也很容易混淆：  协方差矩阵和相关矩阵有什么区别？ 为什么 PCA
+          在数据分析、机器学习和科研中，经常会遇到下面几个概念：  数据矩阵 XXX 协方差矩阵（covariance matrix） 相关矩阵（correlation matrix） PCA（Principal Component Analysis，主成分分析）  它们经常一起出现，但初学时也很容易混淆：  协方差矩阵和相关矩阵有什么区别？ 为什么 PCA 研究的是协方差矩阵，而不是原始数据矩阵？ 特征值
         </div>
       </a>
 
@@ -415,7 +415,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2026/03/16/my-blog-setup/" target="_self">
         <div>
-          我的博客终于上线了今天我成功搭建了自己的 Hexo 博客，并部署到了 GitHub Pages。 我用到的技术 Hexo Fluid 主题 GitHub Pages SSH 部署  遇到的问题1. HTTPS 推送失败一开始用 HTTPS 部署时，出现了认证失败的问题。 2. SSH 地址写错后来改成 SSH 时，把地址格式写错了，导致仓库识别失败。 3. Pages 分支不一致最后发现 GitH
+          我的博客终于上线了 今天我成功搭建了自己的 Hexo 博客，并部署到了 GitHub Pages。 我用到的技术  Hexo Fluid 主题 GitHub Pages SSH 部署  遇到的问题 1. HTTPS 推送失败 一开始用 HTTPS 部署时，出现了认证失败的问题。 2. SSH 地址写错 后来改成 SSH 时，把地址格式写错了，导致仓库识别失败。 3. Pages 分支不一致 最后发
         </div>
       </a>
 
