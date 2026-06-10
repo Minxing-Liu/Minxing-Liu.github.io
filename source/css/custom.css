@@ -27,13 +27,16 @@ a {
 }
 
 #banner:after {
-  background: linear-gradient(90deg, rgba(12, 24, 35, 0.78), rgba(12, 24, 35, 0.28));
+  background:
+    radial-gradient(ellipse at center, rgba(5, 10, 18, 0.62) 0%, rgba(5, 10, 18, 0.34) 34%, rgba(5, 10, 18, 0.08) 62%, rgba(5, 10, 18, 0) 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.22) 54%, rgba(0, 0, 0, 0.08) 100%);
 }
 
 #logo {
   font-size: 42px;
   line-height: 1.05;
   font-weight: 750;
+  text-shadow: 0 3px 18px rgba(0, 0, 0, 0.72), 0 1px 3px rgba(0, 0, 0, 0.84);
 }
 
 #subtitle {
@@ -42,6 +45,8 @@ a {
   line-height: 1.5;
   max-width: 680px;
   display: inline-block;
+  color: rgba(255, 255, 255, 0.96);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.88), 0 1px 3px rgba(0, 0, 0, 0.95);
 }
 
 #main-nav {
