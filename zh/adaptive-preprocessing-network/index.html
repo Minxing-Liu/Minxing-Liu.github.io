@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>自适应预处理网络复习笔记：去相关效果与机制 | Minxing Liu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="自适应预处理网络复习笔记：去相关效果与机制0. 先给自己一个总图你论文里说的“自适应预处理网络”，对应的是 Chapochnikov, Pehlevan, Chklovskii 2023 中的 ORN-LN adaptive circuit。它的理论来源是 Pehlevan, Sengupta, Chklovskii 2018 的 similarity matching 框架。 一句话理解：">
+<meta property="og:type" content="website">
+<meta property="og:title" content="自适应预处理网络复习笔记：去相关效果与机制">
+<meta property="og:url" content="https://minxing-liu.github.io/zh/adaptive-preprocessing-network/index.html">
+<meta property="og:site_name" content="Minxing Liu">
+<meta property="og:description" content="自适应预处理网络复习笔记：去相关效果与机制0. 先给自己一个总图你论文里说的“自适应预处理网络”，对应的是 Chapochnikov, Pehlevan, Chklovskii 2023 中的 ORN-LN adaptive circuit。它的理论来源是 Pehlevan, Sengupta, Chklovskii 2018 的 similarity matching 框架。 一句话理解：">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-06-10T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-10T11:54:03.218Z">
+<meta property="article:author" content="Minxing Liu">
+<meta property="article:tag" content="computational neuroscience, PhD, tennis, neuroscience, research, blog">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Minxing Liu" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.1"><link rel="stylesheet" href="/css/custom.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Minxing Liu</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Computational neuroscience, olfaction, and notes from the court</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives/">Archives</a>
+        
+          <a class="main-nav-link" href="/categories/Research/">Research</a>
+        
+          <a class="main-nav-link" href="/categories/Tennis/">Tennis</a>
+        
+          <a class="main-nav-link" href="/tags/similarity-matching/">Notes</a>
+        
+          <a class="main-nav-link" href="/about/">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://minxing-liu.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="page-" class="h-entry article article-type-page" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/zh/adaptive-preprocessing-network/index.html" class="article-date">
+  <time class="dt-published" datetime="2026-06-10T04:00:00.000Z" itemprop="datePublished">2026-06-10</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      自适应预处理网络复习笔记：去相关效果与机制
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <meta name="robots" content="noindex,nofollow,noarchive">
+
+<h1 id="自适应预处理网络复习笔记：去相关效果与机制"><a href="#自适应预处理网络复习笔记：去相关效果与机制" class="headerlink" title="自适应预处理网络复习笔记：去相关效果与机制"></a>自适应预处理网络复习笔记：去相关效果与机制</h1><h2 id="0-先给自己一个总图"><a href="#0-先给自己一个总图" class="headerlink" title="0. 先给自己一个总图"></a>0. 先给自己一个总图</h2><p>你论文里说的“自适应预处理网络”，对应的是 Chapochnikov, Pehlevan, Chklovskii 2023 中的 ORN-LN adaptive circuit。它的理论来源是 Pehlevan, Sengupta, Chklovskii 2018 的 similarity matching 框架。</p>
+<p>一句话理解：</p>
+<blockquote>
+<p>这个网络不是手动对 ORN 响应做 PCA whitening，而是用一个可以由局部神经元和突触实现的 ORN-LN 回路，自动学习输入中的主导相关结构，并通过 inhibitory feedback 抑制这些冗余方向，从而实现部分去相关、部分谱均衡和表示效率提升。</p>
+</blockquote>
+<p>可以画成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">odor stimulus</span><br><span class="line">    ↓</span><br><span class="line">ORN soma activity x</span><br><span class="line">    ↓</span><br><span class="line">ORN axon output y  ← inhibitory feedback from LN</span><br><span class="line">    ↕</span><br><span class="line">LN activity z</span><br><span class="line">    ↓</span><br><span class="line">learned W, M</span><br></pre></td></tr></table></figure>
+
+<p>其中：</p>
+<ul>
+<li><code>x</code>：ORN soma 原始输入活动。</li>
+<li><code>y</code>：ORN axon &#x2F; 预处理后的输出活动。</li>
+<li><code>z</code>：LN &#x2F; lateral feature activity。</li>
+<li><code>W</code>：ORN-LN 或 y-z 之间学到的相关结构。</li>
+<li><code>M</code>：LN-LN 内部相关 &#x2F; 抑制结构。</li>
+</ul>
+<hr>
+<h2 id="1-这个网络到底在优化什么"><a href="#1-这个网络到底在优化什么" class="headerlink" title="1. 这个网络到底在优化什么"></a>1. 这个网络到底在优化什么</h2><p>Similarity matching 的核心目标是：输出表示应该保留输入样本之间的相似关系。</p>
+<p>如果：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">X = [x(1), x(2), ..., x(T)]</span><br><span class="line">Y = [y(1), y(2), ..., y(T)]</span><br></pre></td></tr></table></figure>
+
+<p>那么：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">X.T X = 输入样本之间的相似性</span><br><span class="line">Y.T Y = 输出样本之间的相似性</span><br></pre></td></tr></table></figure>
+
+<p>最直观的目标是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">让 Y.T Y 接近 X.T X</span><br></pre></td></tr></table></figure>
+
+<p>也就是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入中相似的气味，输出中仍相似</span><br><span class="line">输入中不同的气味，输出中仍不同</span><br></pre></td></tr></table></figure>
+
+<p>这个目标听起来像只是“保持几何关系”，但关键在于：当加入神经网络结构、辅助变量、非负性或维度限制后，它会导出具有 Hebbian &#x2F; anti-Hebbian 局部学习规则的网络。</p>
+<p>Pehlevan 2018 的重点是解释：</p>
+<blockquote>
+<p>为什么一个全局的 similarity matching objective，最后可以变成每个突触只依赖局部 pre&#x2F;post 活动的学习规则。</p>
+</blockquote>
+<p>这对你的论文很重要，因为你可以说：</p>
+<blockquote>
+<p>我的自适应预处理网络不是任意设计的黑箱变换，而是有 normative objective 支撑的生物可实现回路。</p>
+</blockquote>
+<hr>
+<h2 id="2-LC-和-NNC-是什么"><a href="#2-LC-和-NNC-是什么" class="headerlink" title="2. LC 和 NNC 是什么"></a>2. LC 和 NNC 是什么</h2><p>Chapochnikov 2023 里主要有两类模型：</p>
+<h3 id="2-1-LC-Linear-Circuit"><a href="#2-1-LC-Linear-Circuit" class="headerlink" title="2.1 LC: Linear Circuit"></a>2.1 LC: Linear Circuit</h3><p>LC 指 linear circuit。它的活动变量 <code>y</code> 和 <code>z</code> 没有非负性约束。</p>
+<p>典型连续时间动力学：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dy/dtau = -y - gamma^2 W z + x</span><br><span class="line">dz/dtau = -M z + (rho^2 / gamma^2) W.T y</span><br></pre></td></tr></table></figure>
+
+<p>直觉：</p>
+<ul>
+<li><code>x</code> 驱动 ORN axon output <code>y</code>。</li>
+<li>LN activity <code>z</code> 被 <code>W.T y</code> 驱动。</li>
+<li><code>W z</code> 反馈抑制 <code>y</code>。</li>
+<li><code>M z</code> 表示 LN-LN 之间的竞争或抑制。</li>
+</ul>
+<p>为什么叫 linear？</p>
+<p>因为在给定 <code>W</code> 和 <code>M</code> 时，活动动力学对 <code>y</code>、<code>z</code> 是线性的。稳态解可以被解析研究，因此能看清楚它对输入谱做了什么。</p>
+<h3 id="2-2-NNC-Nonnegative-Circuit"><a href="#2-2-NNC-Nonnegative-Circuit" class="headerlink" title="2.2 NNC: Nonnegative Circuit"></a>2.2 NNC: Nonnegative Circuit</h3><p>NNC 指 nonnegative circuit。它加入：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">y &gt;= 0</span><br><span class="line">z &gt;= 0</span><br></pre></td></tr></table></figure>
+
+<p>离散动力学类似：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">y(tau + 1) = [y(tau) + eta(-y - Wz + x)]_+</span><br><span class="line">z(tau + 1) = [z(tau) + eta(-Mz + rho^2 W.T y)]_+</span><br></pre></td></tr></table></figure>
+
+<p>其中：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[a]_+ = max(0, a)</span><br></pre></td></tr></table></figure>
+
+<p>为什么重要？</p>
+<p>神经活动通常不能任意正负变化，NNC 更接近真实神经元活动。论文中 NNC 对 connectome 中 ORN-LN 权重的预测更有生物意义。</p>
+<hr>
+<h2 id="3-去相关效果从哪里来"><a href="#3-去相关效果从哪里来" class="headerlink" title="3. 去相关效果从哪里来"></a>3. 去相关效果从哪里来</h2><p>去相关不是网络手动调用 PCA，而是 lateral feedback 的结果。</p>
+<p>设输入 covariance 为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C_x = E[x x.T]</span><br></pre></td></tr></table></figure>
+
+<p>如果输入中有很强的主方向：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">C_x = U diag(lambda_1, lambda_2, ..., lambda_N) U.T</span><br><span class="line">lambda_1 &gt;&gt; lambda_2 &gt;&gt; ...</span><br></pre></td></tr></table></figure>
+
+<p>说明 ORN 表示里有少数方向占据大部分方差。这些方向可能对应：</p>
+<ul>
+<li>总浓度轴。</li>
+<li>相似分子族共同激活。</li>
+<li>多个 ORN 的共享响应模式。</li>
+<li>dominant molecular block。</li>
+</ul>
+<p>LN 的作用是学到这些常见、强烈、重复出现的方向。</p>
+<p>机制可以理解为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">强相关方向反复出现</span><br><span class="line">    ↓</span><br><span class="line">LN z 更容易被这些方向驱动</span><br><span class="line">    ↓</span><br><span class="line">W 学到 y 与 z 的相关模式</span><br><span class="line">    ↓</span><br><span class="line">下次同类方向出现时，Wz 反馈抑制 y</span><br><span class="line">    ↓</span><br><span class="line">主导方向方差被压低</span><br><span class="line">    ↓</span><br><span class="line">输出更去相关、更谱均衡</span><br></pre></td></tr></table></figure>
+
+<p>这就是 partial decorrelation 的本质。</p>
+<hr>
+<h2 id="4-为什么是“部分去相关”，不是完整-PCA-whitening"><a href="#4-为什么是“部分去相关”，不是完整-PCA-whitening" class="headerlink" title="4. 为什么是“部分去相关”，不是完整 PCA whitening"></a>4. 为什么是“部分去相关”，不是完整 PCA whitening</h2><p>PCA whitening 做的是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. 计算输入 covariance</span><br><span class="line">2. 找到所有 principal components</span><br><span class="line">3. 旋转到 PCA 坐标</span><br><span class="line">4. 每个方向除以 sqrt(lambda_i)</span><br><span class="line">5. 输出 covariance 变成 identity</span><br></pre></td></tr></table></figure>
+
+<p>所以 PCA whitening 的理想结果是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C_y = I</span><br></pre></td></tr></table></figure>
+
+<p>但 LC &#x2F; NNC 网络不是这样做的。</p>
+<p>它受到这些限制：</p>
+<ol>
+<li>LN 数量有限，记作 <code>K</code>。</li>
+<li>网络通过动态反馈压缩主方向，不是显式除以 <code>sqrt(lambda_i)</code>。</li>
+<li>压缩形式通常是 nonlinear shrinkage。</li>
+<li>NNC 还有非负性约束。</li>
+<li>学习规则是局部的、在线的，依赖样本统计。</li>
+</ol>
+<p>所以更准确的表述是：</p>
+<blockquote>
+<p>The circuit partially whitens and normalizes ORN representations through inhibitory feedback.</p>
+</blockquote>
+<p>中文：</p>
+<blockquote>
+<p>该回路通过抑制性反馈对 ORN 表示进行部分白化和归一化。</p>
+</blockquote>
+<p>但在你的论文里更稳妥的说法是：</p>
+<blockquote>
+<p>它实现的是部分去相关 &#x2F; 部分谱均衡，而不是严格 PCA whitening。</p>
+</blockquote>
+<hr>
+<h2 id="5-参数怎么影响去相关"><a href="#5-参数怎么影响去相关" class="headerlink" title="5. 参数怎么影响去相关"></a>5. 参数怎么影响去相关</h2><h3 id="5-1-K：LN-数量，也就是可处理的方向数"><a href="#5-1-K：LN-数量，也就是可处理的方向数" class="headerlink" title="5.1 K：LN 数量，也就是可处理的方向数"></a>5.1 K：LN 数量，也就是可处理的方向数</h3><p><code>K</code> 是 LN &#x2F; lateral units 数量。</p>
+<p>直觉：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">K 越大，网络理论上可以捕捉和抑制更多主导方向。</span><br></pre></td></tr></table></figure>
+
+<p>但：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">K = 50 不等于 effective dimension = 50</span><br></pre></td></tr></table></figure>
+
+<p>原因：</p>
+<ul>
+<li><code>K</code> 只是 lateral population 的容量。</li>
+<li>实际学到哪些方向取决于输入谱、样本数、学习动态。</li>
+<li>每个方向压缩多强取决于 <code>rho</code>。</li>
+<li>输入本来很干净时，增加 K 的边际收益会变小。</li>
+</ul>
+<h3 id="5-2-rho：谱压缩强度"><a href="#5-2-rho：谱压缩强度" class="headerlink" title="5.2 rho：谱压缩强度"></a>5.2 rho：谱压缩强度</h3><p><code>rho</code> 是最关键的去相关强度参数之一。</p>
+<p>补充材料里提到 scaling <code>X</code> 和 scaling <code>rho</code> 有等价关系，这说明 <code>rho</code> 实际上控制的是输入强度与网络压缩强度之间的相对尺度。</p>
+<p>直觉：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">rho 小：feedback/shrinkage 弱，y 接近 x</span><br><span class="line">rho 中等：主导方向被压缩，ED 上升，correlation 下降</span><br><span class="line">rho 太大：可能过度压缩，任务相关方差信息也被削弱</span><br></pre></td></tr></table></figure>
+
+<p>注意：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rho -&gt; infinity 不等于 exact whitening</span><br></pre></td></tr></table></figure>
+
+<p>因为它不是 PCA 的 <code>1/sqrt(lambda_i)</code> 缩放。</p>
+<h3 id="5-3-gamma：实现尺度参数"><a href="#5-3-gamma：实现尺度参数" class="headerlink" title="5.3 gamma：实现尺度参数"></a>5.3 gamma：实现尺度参数</h3><p><code>gamma</code> 出现在：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dy/dtau = -y - gamma^2 Wz + x</span><br><span class="line">dz/dtau = -Mz + (rho^2 / gamma^2) W.T y</span><br></pre></td></tr></table></figure>
+
+<p>它同时改变：</p>
+<ul>
+<li><code>z</code> 对 <code>y</code> 的 feedback 强度。</li>
+<li><code>y</code> 对 <code>z</code> 的 drive 强度。</li>
+</ul>
+<p>所以 <code>gamma</code> 不是单纯的“越大越去相关”。它更像电路实现中的尺度匹配参数，会影响活动幅度、权重尺度、时间常数和稳定性。</p>
+<h3 id="5-4-学习率-eta"><a href="#5-4-学习率-eta" class="headerlink" title="5.4 学习率 eta"></a>5.4 学习率 eta</h3><p>突触更新：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">W &lt;- W + eta_1 (y z.T - W)</span><br><span class="line">M &lt;- M + eta_2 (z z.T - M)</span><br></pre></td></tr></table></figure>
+
+<p>解释：</p>
+<ul>
+<li><code>y z.T</code> 是 Hebbian term。</li>
+<li><code>z z.T</code> 学到 LN 内部相关结构。</li>
+<li><code>-W</code> 和 <code>-M</code> 是衰减项，防止权重无限增长。</li>
+</ul>
+<p>学习率太小：</p>
+<ul>
+<li>学得慢。</li>
+<li>需要更多 odor samples。</li>
+</ul>
+<p>学习率太大：</p>
+<ul>
+<li>可能追着单个样本波动。</li>
+<li>学到噪声方向。</li>
+<li>稳态不稳定。</li>
+</ul>
+<hr>
+<h2 id="6-你论文里的诊断指标怎么解释"><a href="#6-你论文里的诊断指标怎么解释" class="headerlink" title="6. 你论文里的诊断指标怎么解释"></a>6. 你论文里的诊断指标怎么解释</h2><p>你现在图里常用指标：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Effective dimension</td>
+<td>方差是否分散到更多维度</td>
+</tr>
+<tr>
+<td>Mean abs offdiag correlation</td>
+<td>平均通道相关性</td>
+</tr>
+<tr>
+<td>Max abs offdiag correlation</td>
+<td>最强残余相关</td>
+</tr>
+<tr>
+<td>PC1 + PC2</td>
+<td>前两个主成分是否支配表示</td>
+</tr>
+</tbody></table>
+<p>如果 LC 有去相关效果，你应该看到：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Effective dimension 上升</span><br><span class="line">mean abs offdiag correlation 下降</span><br><span class="line">max abs offdiag correlation 下降</span><br><span class="line">PC1 + PC2 explained variance 下降</span><br></pre></td></tr></table></figure>
+
+<p>但不要只看分类准确率。</p>
+<p>去相关和分类准确率不是同一个目标：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">去相关 = 表示效率 / 冗余降低</span><br><span class="line">分类准确率 = 当前标签、噪声、读出器共同决定</span><br></pre></td></tr></table></figure>
+
+<p>如果标签本来就沿着 ORN 的高方差方向很好分开，强行去相关可能不会提升分类，甚至略降。</p>
+<p>所以你的论文里可以写：</p>
+<blockquote>
+<p>LC preprocessing improves representational efficiency by reducing redundancy and flattening the response spectrum. However, this improvement does not necessarily translate into higher classification accuracy, because downstream performance depends on the alignment between task labels and the variance structure of the input representation.</p>
+</blockquote>
+<hr>
+<h2 id="7-推荐研读顺序"><a href="#7-推荐研读顺序" class="headerlink" title="7. 推荐研读顺序"></a>7. 推荐研读顺序</h2><h3 id="第-1-遍：只读问题和结论"><a href="#第-1-遍：只读问题和结论" class="headerlink" title="第 1 遍：只读问题和结论"></a>第 1 遍：只读问题和结论</h3><p>读 Chapochnikov 2023 主文：</p>
+<ol>
+<li>Abstract</li>
+<li>Significance statement</li>
+<li>Introduction 中关于 ORN-LN preprocessing 的动机</li>
+<li>Fig. 1 电路结构</li>
+<li>Fig. 4 或涉及模型结果的部分</li>
+</ol>
+<p>目标：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">知道这个网络为什么被提出：</span><br><span class="line">connectome + activity + similarity matching -&gt; adaptive circuit</span><br></pre></td></tr></table></figure>
+
+<h3 id="第-2-遍：读电路公式"><a href="#第-2-遍：读电路公式" class="headerlink" title="第 2 遍：读电路公式"></a>第 2 遍：读电路公式</h3><p>重点看：</p>
+<ul>
+<li>LC equations</li>
+<li>NNC equations</li>
+<li>Synaptic plasticity equations</li>
+</ul>
+<p>问自己：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">x, y, z 分别是什么？</span><br><span class="line">W, M 分别是什么？</span><br><span class="line">公式 6 是给定 W/M 后的快速活动动力学吗？</span><br><span class="line">公式 8 是跨样本更新 W/M 的慢学习规则吗？</span><br></pre></td></tr></table></figure>
+
+<p>答案：</p>
+<blockquote>
+<p>是。活动动力学是单个 stimulus 下的 fast inference；突触更新是多个 stimulus 上的 slow learning。</p>
+</blockquote>
+<h3 id="第-3-遍：读补充材料"><a href="#第-3-遍：读补充材料" class="headerlink" title="第 3 遍：读补充材料"></a>第 3 遍：读补充材料</h3><p>重点看：</p>
+<ul>
+<li>Optimization problem</li>
+<li>Equivalence of scaling X and rho</li>
+<li>Circuit dynamical equations</li>
+<li>Steady-state solution and stability</li>
+<li>Effect of rho and gamma</li>
+</ul>
+<p>目标：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">理解 rho/gamma 不是随便调参，而是电路计算和实现尺度的一部分。</span><br></pre></td></tr></table></figure>
+
+<h3 id="第-4-遍：读-Pehlevan-2018"><a href="#第-4-遍：读-Pehlevan-2018" class="headerlink" title="第 4 遍：读 Pehlevan 2018"></a>第 4 遍：读 Pehlevan 2018</h3><p>重点不是所有数学细节，而是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">为什么 similarity matching 可以导出局部 Hebbian / anti-Hebbian 网络？</span><br></pre></td></tr></table></figure>
+
+<p>你只需要抓住：</p>
+<ul>
+<li>全局目标：保持 pairwise similarity。</li>
+<li>变量替换：把全局目标拆成局部可优化形式。</li>
+<li>神经解释：突触只需要 pre&#x2F;post 活动。</li>
+<li>结果：Hebbian feedforward &#x2F; anti-Hebbian lateral competition。</li>
+</ul>
+<hr>
+<h2 id="8-最容易混淆的点"><a href="#8-最容易混淆的点" class="headerlink" title="8. 最容易混淆的点"></a>8. 最容易混淆的点</h2><h3 id="混淆-1：公式-6-和公式-8-是不是同一件事？"><a href="#混淆-1：公式-6-和公式-8-是不是同一件事？" class="headerlink" title="混淆 1：公式 6 和公式 8 是不是同一件事？"></a>混淆 1：公式 6 和公式 8 是不是同一件事？</h3><p>不是。</p>
+<p>公式 6 &#x2F; 7：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">给定当前 W, M 和当前输入 x</span><br><span class="line">求 y, z 的稳态活动</span><br></pre></td></tr></table></figure>
+
+<p>这是 fast inference。</p>
+<p>公式 8：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">用当前得到的 y, z 更新 W, M</span><br></pre></td></tr></table></figure>
+
+<p>这是 slow learning。</p>
+<h3 id="混淆-2：LN-是不是直接等于-PCA-component？"><a href="#混淆-2：LN-是不是直接等于-PCA-component？" class="headerlink" title="混淆 2：LN 是不是直接等于 PCA component？"></a>混淆 2：LN 是不是直接等于 PCA component？</h3><p>不是。</p>
+<p>LN activity <code>z</code> 可以理解为学到主导特征或 soft cluster membership，但它不是手动 PCA 之后的 component。</p>
+<h3 id="混淆-3：去相关是不是一定提高分类准确率？"><a href="#混淆-3：去相关是不是一定提高分类准确率？" class="headerlink" title="混淆 3：去相关是不是一定提高分类准确率？"></a>混淆 3：去相关是不是一定提高分类准确率？</h3><p>不是。</p>
+<p>去相关改善的是表示几何和效率。分类准确率取决于任务标签是否受益于这种几何改变。</p>
+<h3 id="混淆-4：LC-是不是-whitening？"><a href="#混淆-4：LC-是不是-whitening？" class="headerlink" title="混淆 4：LC 是不是 whitening？"></a>混淆 4：LC 是不是 whitening？</h3><p>不是严格 whitening。更准确：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LC / NNC performs partial whitening, normalization, and decorrelation.</span><br></pre></td></tr></table></figure>
+
+<p>论文里如果想稳妥：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">partial decorrelation / partial spectral equalization</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="9-可以写进你论文的中文解释"><a href="#9-可以写进你论文的中文解释" class="headerlink" title="9. 可以写进你论文的中文解释"></a>9. 可以写进你论文的中文解释</h2><p>自适应预处理网络可以被理解为一种由 similarity matching 原理推导出的 ORN-LN 回路。该网络的目标不是简单复制输入，也不是显式执行 PCA 白化，而是在保留气味样本相似性结构的同时，通过局部 Hebbian 学习和 LN 间抑制性竞争，自适应地学习输入活动中的主导相关方向。对于单个气味刺激，给定当前突触权重后，ORN 轴突活动和 LN 活动通过快速动力学达到稳态；在多个气味样本呈现过程中，ORN-LN 和 LN-LN 权重则根据局部活动相关性缓慢更新。由于高方差共享方向更容易驱动 LN 活动，这些方向会被 LN 反馈抑制项优先压缩，从而降低 ORN 输出表示中的通道相关性，提高有效维度，并使协方差谱更加均衡。因此，该网络的去相关作用应理解为受生物电路约束的部分去相关或部分白化，而不是严格的 PCA whitening。</p>
+<hr>
+<h2 id="10-一句话复习版"><a href="#10-一句话复习版" class="headerlink" title="10. 一句话复习版"></a>10. 一句话复习版</h2><blockquote>
+<p>这个自适应预处理网络通过 similarity matching 保留气味样本之间的几何关系，同时用 LN 学到并反馈抑制 ORN 表示中的主导相关方向；因此它能降低冗余、提高 effective dimension、实现部分去相关，但它不是精确 PCA whitening，且去相关是否提高分类准确率取决于具体任务和输入统计。</p>
+</blockquote>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://minxing-liu.github.io/zh/adaptive-preprocessing-network/index.html" data-id="cuidXG7muzuKOqFArNmo0A7kt" data-title="自适应预处理网络复习笔记：去相关效果与机制" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/General/">General</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Research/">Research</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tennis/">Tennis</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/PhD-life/" rel="tag">PhD life</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computational-neuroscience/" rel="tag">computational neuroscience</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hello/" rel="tag">hello</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/introduction/" rel="tag">introduction</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mental-game/" rel="tag">mental game</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/neural-circuits/" rel="tag">neural circuits</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/neuroscience/" rel="tag">neuroscience</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/olfaction/" rel="tag">olfaction</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/productivity/" rel="tag">productivity</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/representation-learning/" rel="tag">representation learning</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/research/" rel="tag">research</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/similarity-matching/" rel="tag">similarity matching</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tennis/" rel="tag">tennis</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/PhD-life/" style="font-size: 20px;">PhD life</a> <a href="/tags/computational-neuroscience/" style="font-size: 20px;">computational neuroscience</a> <a href="/tags/hello/" style="font-size: 10px;">hello</a> <a href="/tags/introduction/" style="font-size: 10px;">introduction</a> <a href="/tags/mental-game/" style="font-size: 10px;">mental game</a> <a href="/tags/neural-circuits/" style="font-size: 10px;">neural circuits</a> <a href="/tags/neuroscience/" style="font-size: 10px;">neuroscience</a> <a href="/tags/olfaction/" style="font-size: 10px;">olfaction</a> <a href="/tags/productivity/" style="font-size: 10px;">productivity</a> <a href="/tags/representation-learning/" style="font-size: 10px;">representation learning</a> <a href="/tags/research/" style="font-size: 10px;">research</a> <a href="/tags/similarity-matching/" style="font-size: 10px;">similarity matching</a> <a href="/tags/tennis/" style="font-size: 10px;">tennis</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/06/">June 2026</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/06/">June 2024</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/03/">March 2024</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/01/">January 2024</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2026/06/09/similarity-matching-and-olfactory-preprocessing/">Similarity Matching as an Olfactory Preprocessing Network</a>
+          </li>
+        
+          <li>
+            <a href="/2024/06/15/tennis-and-science/">Tennis and Science — What the Court Has Taught Me About Research</a>
+          </li>
+        
+          <li>
+            <a href="/2024/03/10/why-i-chose-computational-neuroscience/">Why I Chose Computational Neuroscience — and What I&#39;ve Learned So Far</a>
+          </li>
+        
+          <li>
+            <a href="/2024/01/15/welcome/">Welcome to My Corner of the Web</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2026 Minxing Liu<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives/" class="mobile-nav-link">Archives</a>
+  
+    <a href="/categories/Research/" class="mobile-nav-link">Research</a>
+  
+    <a href="/categories/Tennis/" class="mobile-nav-link">Tennis</a>
+  
+    <a href="/tags/similarity-matching/" class="mobile-nav-link">Notes</a>
+  
+    <a href="/about/" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
