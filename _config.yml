@@ -103,4 +103,4 @@ theme: landscape
 deploy:
   type: git
   repo: https://github.com/Minxing-Liu/Minxing-Liu.github.io
-  branch: main
+  branch: master
