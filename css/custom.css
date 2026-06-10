@@ -156,14 +156,36 @@ a {
 
 .article-entry figure.highlight,
 .article-entry .highlight {
+  background: #f6faf9 !important;
+  border: 1px solid #d5e4df;
   border-radius: 8px;
+  color: #17202a !important;
   margin: 20px 0;
   overflow-x: auto;
 }
 
+.article-entry figure.highlight .gutter,
+.article-entry .highlight .gutter {
+  display: none;
+}
+
 .article-entry figure.highlight table,
 .article-entry .highlight table {
+  background: transparent !important;
+  border: 0;
   width: auto;
+}
+
+.article-entry figure.highlight td,
+.article-entry .highlight td,
+.article-entry figure.highlight pre,
+.article-entry .highlight pre,
+.article-entry figure.highlight code,
+.article-entry .highlight code,
+.article-entry figure.highlight .line,
+.article-entry .highlight .line {
+  background: transparent !important;
+  color: #17202a !important;
 }
 
 .article-entry figure.highlight pre,
