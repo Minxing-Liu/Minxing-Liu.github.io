@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Similarity Matching as an Olfactory Preprocessing Network | Minxing Liu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="One question I keep coming back to in olfaction is deceptively simple: before odors reach the downstream classifier-like layers of the brain, what should the early circuit do to the raw receptor respo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Similarity Matching as an Olfactory Preprocessing Network">
+<meta property="og:url" content="https://minxing-liu.github.io/2026/06/09/similarity-matching-and-olfactory-preprocessing/index.html">
+<meta property="og:site_name" content="Minxing Liu">
+<meta property="og:description" content="One question I keep coming back to in olfaction is deceptively simple: before odors reach the downstream classifier-like layers of the brain, what should the early circuit do to the raw receptor respo">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://minxing-liu.github.io/images/lc-preprocessing-pca-decorrelation.png">
+<meta property="article:published_time" content="2026-06-09T14:30:00.000Z">
+<meta property="article:modified_time" content="2026-06-09T09:46:35.539Z">
+<meta property="article:author" content="Minxing Liu">
+<meta property="article:tag" content="computational neuroscience">
+<meta property="article:tag" content="neural circuits">
+<meta property="article:tag" content="olfaction">
+<meta property="article:tag" content="representation learning">
+<meta property="article:tag" content="similarity matching">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://minxing-liu.github.io/images/lc-preprocessing-pca-decorrelation.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Minxing Liu" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Minxing Liu</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">PhD in Computational Neuroscience | Tennis Lover</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://minxing-liu.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-similarity-matching-and-olfactory-preprocessing" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/06/09/similarity-matching-and-olfactory-preprocessing/" class="article-date">
+  <time class="dt-published" datetime="2026-06-09T14:30:00.000Z" itemprop="datePublished">2026-06-09</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Research/">Research</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      Similarity Matching as an Olfactory Preprocessing Network
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>One question I keep coming back to in olfaction is deceptively simple: before odors reach the downstream classifier-like layers of the brain, what should the early circuit do to the raw receptor responses?</p>
+<p>Olfactory receptor neurons (ORNs) already transform chemical mixtures into neural activity. But their responses can be redundant, correlated, and strongly shaped by nuisance variables such as total concentration. A good preprocessing circuit should keep the useful relationships between odors while making the representation more efficient for downstream computation.</p>
+<p>This is where <strong>similarity matching</strong> becomes a useful lens.</p>
+<span id="more"></span>
+
+<h2 id="The-Basic-Idea"><a href="#The-Basic-Idea" class="headerlink" title="The Basic Idea"></a>The Basic Idea</h2><p>Suppose we collect odor responses into a data matrix:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">X = [x(1), x(2), ..., x(T)]</span><br></pre></td></tr></table></figure>
+
+<p>Each column is one odor sample, and each row is one neural channel. A similarity matching objective asks the output representation <code>Y</code> to preserve the pairwise geometry of the input:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">input similarity:   X.T X</span><br><span class="line">output similarity:  Y.T Y</span><br><span class="line"></span><br><span class="line">goal: make Y.T Y close to X.T X</span><br></pre></td></tr></table></figure>
+
+<p>In words: if two odors are similar in the input representation, they should remain similar in the output; if they are different, the output should keep them apart. That sounds almost too broad, but the power of the framework is that once we impose neural constraints, the objective can become a biologically plausible circuit.</p>
+<p>Pehlevan, Sengupta, and Chklovskii showed that similarity matching objectives can lead to networks with local Hebbian and anti-Hebbian learning rules. The global geometry problem can be rewritten using auxiliary variables so that each synapse updates from local pre- and post-synaptic activity.</p>
+<p>That is the beautiful move: a high-level coding principle turns into a mechanistic network.</p>
+<h2 id="From-Similarity-Matching-to-an-Olfactory-Circuit"><a href="#From-Similarity-Matching-to-an-Olfactory-Circuit" class="headerlink" title="From Similarity Matching to an Olfactory Circuit"></a>From Similarity Matching to an Olfactory Circuit</h2><p>In the olfactory preprocessing model I am studying, the circuit has three main activity variables:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">x(t): ORN input response to odor t</span><br><span class="line">y(t): preprocessed output activity</span><br><span class="line">z(t): lateral interneuron / feature activity</span><br></pre></td></tr></table></figure>
+
+<p>The lateral population <code>z</code> is not just a nuisance variable. It represents the dominant features or directions that the circuit uses to reshape the output code. The recurrent and reciprocal interactions can be written schematically as:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dy/dtau = -y - gamma^2 W z + x</span><br><span class="line">dz/dtau = -M z + (rho^2 / gamma^2) W.T y</span><br></pre></td></tr></table></figure>
+
+<p>with slow activity-dependent updates:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">W &lt;- W + eta * (y z.T - W)</span><br><span class="line">M &lt;- M + eta * (z z.T - M)</span><br></pre></td></tr></table></figure>
+
+<p>The exact constants matter for implementation, but the intuition is simpler:</p>
+<ul>
+<li><code>W</code> learns correlations between the output channels and lateral features.</li>
+<li><code>M</code> learns correlations within the lateral population.</li>
+<li>The lateral loop suppresses dominant shared structure in the ORN representation.</li>
+<li>The output becomes more spectrally balanced and less pairwise correlated.</li>
+</ul>
+<p>This is the connection to the preprocessing circuit studied by Chapochnikov, Pehlevan, and Chklovskii. In that work, a similarity-matching-derived circuit provides a normative and mechanistic account of how olfactory representations can be normalized, partially whitened, and decorrelated.</p>
+<h2 id="Partial-Whitening-Not-Magic-Whitening"><a href="#Partial-Whitening-Not-Magic-Whitening" class="headerlink" title="Partial Whitening, Not Magic Whitening"></a>Partial Whitening, Not Magic Whitening</h2><p>One important point for my thesis is that this LC-style preprocessing is <strong>not the same thing as PCA whitening</strong>.</p>
+<p>PCA whitening is an idealized operation: it rotates the data into principal components and rescales every dimension so the covariance becomes the identity matrix. That is useful as a reference, but it is not the literal computation of the biological circuit.</p>
+<p>The LC model is more constrained. In the closed-form view, the circuit mainly shrinks the leading singular directions of the input. If the circuit has <code>K</code> lateral units, then <code>K</code> controls how many dominant directions can be directly acted on. The parameter <code>rho</code> changes the strength and shape of the spectral shrinkage, but increasing <code>rho</code> is not the same as turning the circuit into exact whitening.</p>
+<p>So the right phrase is:</p>
+<blockquote>
+<p>LC performs partial decorrelation or partial spectral equalization, not full PCA whitening.</p>
+</blockquote>
+<p>That distinction matters. Otherwise it is too easy to overstate what the network is doing.</p>
+<h2 id="My-Current-Diagnostic-Figure"><a href="#My-Current-Diagnostic-Figure" class="headerlink" title="My Current Diagnostic Figure"></a>My Current Diagnostic Figure</h2><p>The figure below compares three representations in my current synthetic olfactory setting: the ORN response, the LC-preprocessed response, and an idealized PCA-whitened reference.</p>
+<p><img src="/images/lc-preprocessing-pca-decorrelation.png" alt="ORN, LC, and PCA whitening diagnostics"></p>
+<p>The main numbers are:</p>
+<table>
+<thead>
+<tr>
+<th>Representation</th>
+<th align="right">Effective dimension</th>
+<th align="right">Mean abs offdiag r</th>
+<th align="right">Max abs offdiag r</th>
+<th align="right">PC1 + PC2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ORN response</td>
+<td align="right">25.53</td>
+<td align="right">0.111</td>
+<td align="right">0.515</td>
+<td align="right">16.8%</td>
+</tr>
+<tr>
+<td>LC output</td>
+<td align="right">41.80</td>
+<td align="right">0.049</td>
+<td align="right">0.234</td>
+<td align="right">8.0%</td>
+</tr>
+<tr>
+<td>PCA whitening</td>
+<td align="right">50.00</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">4.0%</td>
+</tr>
+</tbody></table>
+<p>There are a few things I like about this diagnostic.</p>
+<p>First, the ORN representation is no longer dominated by a trivial total-concentration axis. In an earlier dense sensitivity setup, nearly every ORN responded positively to nearly every molecule, so the first PC mostly measured “how much odor is present.” After composition normalization and sparse balanced receptor tuning, the ORN geometry is much healthier.</p>
+<p>Second, the LC transformation clearly moves the representation toward a flatter, less redundant code. The effective dimension increases from 25.53 to 41.80, and the mean off-diagonal feature correlation falls from 0.111 to 0.049.</p>
+<p>Third, PCA whitening is useful as a ceiling, not as the biological target. It reaches effective dimension 50 and zero off-diagonal correlations by construction. The LC output approaches that direction but remains a constrained circuit computation.</p>
+<h2 id="Why-This-Does-Not-Automatically-Improve-Classification"><a href="#Why-This-Does-Not-Automatically-Improve-Classification" class="headerlink" title="Why This Does Not Automatically Improve Classification"></a>Why This Does Not Automatically Improve Classification</h2><p>One subtle lesson from this project is that better decorrelation metrics do not guarantee better classification accuracy.</p>
+<p>For the dominant molecular-block task, linear classifiers in the current setup are already strong on the ORN representation. The LC output slightly improves coding efficiency, but downstream accuracy depends on the label rule, noise, thresholds, and the random sparse expansion used by Kenyon-cell-like layers.</p>
+<p>In my current runs, the rough picture is:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">without KC expansion:</span><br><span class="line">ORN       ~0.921 +/- 0.011</span><br><span class="line">LC        ~0.918 +/- 0.012</span><br><span class="line">PCA white ~0.904 +/- 0.010</span><br><span class="line"></span><br><span class="line">with sparse KC expansion:</span><br><span class="line">ORN-KC       ~0.918 +/- 0.009</span><br><span class="line">LC-KC        ~0.908 +/- 0.009</span><br><span class="line">PCA white-KC ~0.891 +/- 0.013</span><br></pre></td></tr></table></figure>
+
+<p>That is not a failure of the LC model. It is a warning about the task. A preprocessing circuit can be excellent at reducing redundancy and still not improve a particular supervised readout if the original representation already exposes the label structure.</p>
+<p>For me, the interesting question is not simply “does LC increase accuracy?” It is:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Under which odor statistics, noise regimes, and downstream constraints</span><br><span class="line">does partial decorrelation become behaviorally useful?</span><br></pre></td></tr></table></figure>
+
+<p>That question feels much closer to the biology.</p>
+<h2 id="What-I-Want-to-Understand-Next"><a href="#What-I-Want-to-Understand-Next" class="headerlink" title="What I Want to Understand Next"></a>What I Want to Understand Next</h2><p>The next stage of this project is to study the network itself more deeply:</p>
+<ul>
+<li>how <code>K</code> controls the number of suppressed principal directions;</li>
+<li>how <code>rho</code> changes the shrinkage curve without becoming exact whitening;</li>
+<li>when partial decorrelation helps downstream sparse random expansion;</li>
+<li>how online learning adapts when the odor distribution shifts;</li>
+<li>whether the same circuit can be interpreted as both efficient coding and feature extraction.</li>
+</ul>
+<p>Similarity matching is attractive because it does not stop at a descriptive statement like “the circuit decorrelates odors.” It gives a bridge from objective, to dynamics, to synaptic rules, to measurable representational geometry.</p>
+<p>That bridge is the part I want to keep building.</p>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
+<li>Chapochnikov, N., Pehlevan, C., and Chklovskii, D. B. (2023). <a target="_blank" rel="noopener" href="https://doi.org/10.1073/pnas.2117484120">Normative and mechanistic model of an adaptive circuit for efficient encoding and feature extraction</a>.</li>
+<li>Pehlevan, C., Sengupta, A. M., and Chklovskii, D. B. (2018). <a target="_blank" rel="noopener" href="https://doi.org/10.1162/NECO_A_01018">Why Do Similarity Matching Objectives Lead to Hebbian&#x2F;Anti-Hebbian Networks?</a>. Also available on <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1703.07914">arXiv</a>.</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://minxing-liu.github.io/2026/06/09/similarity-matching-and-olfactory-preprocessing/" data-id="cuidkMK95NFBnxfR31raTkpYr" data-title="Similarity Matching as an Olfactory Preprocessing Network" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/computational-neuroscience/" rel="tag">computational neuroscience</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/neural-circuits/" rel="tag">neural circuits</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/olfaction/" rel="tag">olfaction</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/representation-learning/" rel="tag">representation learning</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/similarity-matching/" rel="tag">similarity matching</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2024/06/15/tennis-and-science/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Tennis and Science — What the Court Has Taught Me About Research</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/General/">General</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Research/">Research</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tennis/">Tennis</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/PhD-life/" rel="tag">PhD life</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computational-neuroscience/" rel="tag">computational neuroscience</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hello/" rel="tag">hello</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/introduction/" rel="tag">introduction</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mental-game/" rel="tag">mental game</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/neural-circuits/" rel="tag">neural circuits</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/neuroscience/" rel="tag">neuroscience</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/olfaction/" rel="tag">olfaction</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/productivity/" rel="tag">productivity</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/representation-learning/" rel="tag">representation learning</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/research/" rel="tag">research</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/similarity-matching/" rel="tag">similarity matching</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tennis/" rel="tag">tennis</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/PhD-life/" style="font-size: 20px;">PhD life</a> <a href="/tags/computational-neuroscience/" style="font-size: 20px;">computational neuroscience</a> <a href="/tags/hello/" style="font-size: 10px;">hello</a> <a href="/tags/introduction/" style="font-size: 10px;">introduction</a> <a href="/tags/mental-game/" style="font-size: 10px;">mental game</a> <a href="/tags/neural-circuits/" style="font-size: 10px;">neural circuits</a> <a href="/tags/neuroscience/" style="font-size: 10px;">neuroscience</a> <a href="/tags/olfaction/" style="font-size: 10px;">olfaction</a> <a href="/tags/productivity/" style="font-size: 10px;">productivity</a> <a href="/tags/representation-learning/" style="font-size: 10px;">representation learning</a> <a href="/tags/research/" style="font-size: 10px;">research</a> <a href="/tags/similarity-matching/" style="font-size: 10px;">similarity matching</a> <a href="/tags/tennis/" style="font-size: 10px;">tennis</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/06/">June 2026</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/06/">June 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/03/">March 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/01/">January 2024</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2026/06/09/similarity-matching-and-olfactory-preprocessing/">Similarity Matching as an Olfactory Preprocessing Network</a>
+          </li>
+        
+          <li>
+            <a href="/2024/06/15/tennis-and-science/">Tennis and Science — What the Court Has Taught Me About Research</a>
+          </li>
+        
+          <li>
+            <a href="/2024/03/10/why-i-chose-computational-neuroscience/">Why I Chose Computational Neuroscience — and What I&#39;ve Learned So Far</a>
+          </li>
+        
+          <li>
+            <a href="/2024/01/15/welcome/">Welcome to My Corner of the Web</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2026 Minxing Liu<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
