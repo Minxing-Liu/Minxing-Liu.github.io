@@ -19,3 +19,6 @@ sitemap: false
 - 再让 agent 根据中文草稿生成或更新英文官网文章。
 - 如果某些中文内容也想发布到这里，可以单独说明。
 
+## 已发布中文笔记
+
+- [自适应预处理网络复习笔记：去相关效果与机制](/zh/adaptive-preprocessing-network/)
