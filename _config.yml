@@ -98,6 +98,25 @@ ignore:
 ## Themes: https://hexo.io/themes/
 theme: landscape
 
+theme_config:
+  menu:
+    Home: /
+    Research: /categories/Research/
+    Tennis: /categories/Tennis/
+    Notes: /tags/similarity-matching/
+    Archives: /archives/
+    About: /about/
+  subtitle: Computational neuroscience, olfaction, and notes from the court
+  banner: images/site-banner.svg
+  sidebar: right
+  widgets:
+    - category
+    - tag
+    - recent_posts
+    - archive
+  show_count: true
+  recent_posts_limits: 5
+
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
