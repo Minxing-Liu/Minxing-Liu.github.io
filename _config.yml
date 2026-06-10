@@ -107,7 +107,7 @@ theme_config:
     Archives: /archives/
     About: /about/
   subtitle: Computational neuroscience, olfaction, and notes from the court
-  banner: css/images/banner.jpg
+  banner: images/banner.jpg
   sidebar: right
   widgets:
     - category
