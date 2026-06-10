@@ -123,6 +123,63 @@ a {
   color: #33413d;
 }
 
+.article-entry .equation-block {
+  background: #f6faf9;
+  border: 1px solid #d5e4df;
+  border-left: 4px solid var(--site-accent);
+  border-radius: 8px;
+  color: #17202a;
+  font-family: "Source Code Pro", Consolas, monospace;
+  font-size: 18px;
+  line-height: 1.75;
+  margin: 22px 0;
+  overflow-x: auto;
+  padding: 18px 22px;
+}
+
+.article-entry .equation-block div {
+  display: grid;
+  grid-template-columns: minmax(72px, max-content) 28px minmax(220px, 1fr);
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.article-entry .equation-block .eq-left {
+  color: #115b57;
+  font-weight: 650;
+}
+
+.article-entry .equation-block .eq-op {
+  color: var(--site-accent-2);
+  text-align: center;
+}
+
+.article-entry figure.highlight,
+.article-entry .highlight {
+  border-radius: 8px;
+  margin: 20px 0;
+  overflow-x: auto;
+}
+
+.article-entry figure.highlight table,
+.article-entry .highlight table {
+  width: auto;
+}
+
+.article-entry figure.highlight pre,
+.article-entry .highlight pre,
+.article-entry figure.highlight code,
+.article-entry .highlight code {
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.article-entry figure.highlight td,
+.article-entry .highlight td {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
 .article-entry table {
   border-collapse: collapse;
   width: 100%;

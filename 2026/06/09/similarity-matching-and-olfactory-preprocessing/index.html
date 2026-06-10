@@ -15,7 +15,7 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://minxing-liu.github.io/images/lc-preprocessing-pca-decorrelation.png">
 <meta property="article:published_time" content="2026-06-09T14:30:00.000Z">
-<meta property="article:modified_time" content="2026-06-09T09:46:35.539Z">
+<meta property="article:modified_time" content="2026-06-10T06:52:01.949Z">
 <meta property="article:author" content="Minxing Liu">
 <meta property="article:tag" content="computational neuroscience">
 <meta property="article:tag" content="neural circuits">
@@ -137,10 +137,16 @@
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">x(t): ORN input response to odor t</span><br><span class="line">y(t): preprocessed output activity</span><br><span class="line">z(t): lateral interneuron / feature activity</span><br></pre></td></tr></table></figure>
 
 <p>The lateral population <code>z</code> is not just a nuisance variable. It represents the dominant features or directions that the circuit uses to reshape the output code. The recurrent and reciprocal interactions can be written schematically as:</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dy/dtau = -y - gamma^2 W z + x</span><br><span class="line">dz/dtau = -M z + (rho^2 / gamma^2) W.T y</span><br></pre></td></tr></table></figure>
+<div class="equation-block">
+  <div><span class="eq-left">dy/dτ</span><span class="eq-op">=</span><span>-y - γ²Wz + x</span></div>
+  <div><span class="eq-left">dz/dτ</span><span class="eq-op">=</span><span>-Mz + (ρ² / γ²) Wᵀy</span></div>
+</div>
 
 <p>with slow activity-dependent updates:</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">W &lt;- W + eta * (y z.T - W)</span><br><span class="line">M &lt;- M + eta * (z z.T - M)</span><br></pre></td></tr></table></figure>
+<div class="equation-block">
+  <div><span class="eq-left">W</span><span class="eq-op">←</span><span>W + η(yzᵀ - W)</span></div>
+  <div><span class="eq-left">M</span><span class="eq-op">←</span><span>M + η(zzᵀ - M)</span></div>
+</div>
 
 <p>The exact constants matter for implementation, but the intuition is simpler:</p>
 <ul>
