@@ -1,602 +1,413 @@
-﻿
-# 自适应预处理网络复习笔记：去相关效果与机制
+﻿# 自适应预处理网络复习笔记：去相关效果与机制
 
-## 0. 先给自己一个总图
+这篇笔记只解决一个核心问题：
 
-你论文里说的“自适应预处理网络”，对应的是 Chapochnikov, Pehlevan, Chklovskii 2023 中的 ORN-LN adaptive circuit。它的理论来源是 Pehlevan, Sengupta, Chklovskii 2018 的 similarity matching 框架。
+> 为什么这个 ORN-LN 自适应预处理网络的输出 `y` 会比输入 `x` 更去相关？`z`、`K`、LC 和 NNC 到底在里面做了什么？
 
-一句话理解：
-
-> 这个网络不是手动对 ORN 响应做 PCA whitening，而是用一个可以由局部神经元和突触实现的 ORN-LN 回路，自动学习输入中的主导相关结构，并通过 inhibitory feedback 抑制这些冗余方向，从而实现部分去相关、部分谱均衡和表示效率提升。
-
-可以画成：
-
-```text
-odor stimulus
-    ↓
-ORN soma activity x
-    ↓
-ORN axon output y  ← inhibitory feedback from LN
-    ↕
-LN activity z
-    ↓
-learned W, M
-```
-
-其中：
-
-- `x`：ORN soma 原始输入活动。
-- `y`：ORN axon / 预处理后的输出活动。
-- `z`：LN / lateral feature activity。
-- `W`：ORN-LN 或 y-z 之间学到的相关结构。
-- `M`：LN-LN 内部相关 / 抑制结构。
+我先用很慢的直觉解释，再放回论文里的公式语言。
 
 ---
 
-## 1. 这个网络到底在优化什么
+## 0. 先把变量认清楚
 
-Similarity matching 的核心目标是：输出表示应该保留输入样本之间的相似关系。
+| 记号 | 含义 | 可以先粗略理解成 |
+| --- | --- | --- |
+| `x` | ORN soma 的原始输入活动 | 还没预处理的气味响应 |
+| `y` | ORN axon 的输出活动 | 预处理之后送往下游的表示 |
+| `z` | LN / lateral population 的活动 | 负责发现“共同模式”的侧向神经元 |
+| `W` | ORN-LN 之间学到的权重 | 哪些 ORN 模式会驱动哪些 LN |
+| `M` | LN-LN 之间的竞争 / 抑制结构 | LN 之间避免重复解释同一个模式 |
+| `K` | LN 数量，也就是 `z` 的维度 | 最多有多少个侧向通道去解释共享结构 |
 
-如果：
+最简单的回路图是：
 
-```text
-X = [x(1), x(2), ..., x(T)]
-Y = [y(1), y(2), ..., y(T)]
-```
+> odor stimulus → ORN soma activity `x` → ORN axon output `y` → downstream
 
-那么：
+同时，`y` 会驱动 LN activity `z`，而 `z` 又通过 inhibitory feedback 反过来影响 `y`。
 
-```text
-X.T X = 输入样本之间的相似性
-Y.T Y = 输出样本之间的相似性
-```
-
-最直观的目标是：
-
-```text
-让 Y.T Y 接近 X.T X
-```
-
-也就是：
-
-```text
-输入中相似的气味，输出中仍相似
-输入中不同的气味，输出中仍不同
-```
-
-这个目标听起来像只是“保持几何关系”，但关键在于：当加入神经网络结构、辅助变量、非负性或维度限制后，它会导出具有 Hebbian / anti-Hebbian 局部学习规则的网络。
-
-Pehlevan 2018 的重点是解释：
-
-> 为什么一个全局的 similarity matching objective，最后可以变成每个突触只依赖局部 pre/post 活动的学习规则。
-
-这对你的论文很重要，因为你可以说：
-
-> 我的自适应预处理网络不是任意设计的黑箱变换，而是有 normative objective 支撑的生物可实现回路。
+所以 `y` 不是单独由 `x` 决定的。`y` 是 `x` 和 LN 反馈一起达到平衡后的结果。
 
 ---
 
-## 2. LC 和 NNC 是什么
+## 1. 去相关到底是什么意思
 
-Chapochnikov 2023 里主要有两类模型：
+先不要想 PCA。先想一个更简单的问题。
 
-### 2.1 LC: Linear Circuit
+假设有两个 ORN：`x₁` 和 `x₂`。如果很多气味来了以后，它们总是一起变大、一起变小，那么这两个通道就是相关的。
 
-LC 指 linear circuit。它的活动变量 `y` 和 `z` 没有非负性约束。
+这种相关通常说明两件事：
 
-典型连续时间动力学：
+1. 它们各自有自己的信息。
+2. 它们还共享了一部分重复信息。
 
-<div class="equation-block">
-  <div><span class="eq-left">dy/dτ</span><span class="eq-op">=</span><span>-y - γ²Wz + x</span></div>
-  <div><span class="eq-left">dz/dτ</span><span class="eq-op">=</span><span>-Mz + (ρ² / γ²)Wᵀy</span></div>
-</div>
+比如：
 
-直觉：
+| 气味 | `x₁` | `x₂` | 直觉 |
+| --- | ---: | ---: | --- |
+| A | 高 | 高 | 两个 ORN 都被共同因素推高 |
+| B | 低 | 低 | 两个 ORN 都低 |
+| C | 中 | 中 | 仍然一起动 |
 
-- `x` 驱动 ORN axon output `y`。
-- LN activity `z` 被 `W.T y` 驱动。
-- `W z` 反馈抑制 `y`。
-- `M z` 表示 LN-LN 之间的竞争或抑制。
+这里 `x₁` 和 `x₂` 的共同升降可能来自总浓度、某个分子族、背景响应，或者某个 dominant chemical block。这个共同升降就是冗余。
 
-为什么叫 linear？
+去相关不是把信息删掉，而是让输出里的“共同升降”少一点。理想效果是：
 
-因为在给定 `W` 和 `M` 时，活动动力学对 `y`、`z` 是线性的。稳态解可以被解析研究，因此能看清楚它对输入谱做了什么。
+> `x` 里很多 ORN 总是一起动；经过预处理后，`y` 里这种一起动的成分被压小了，于是不同通道更能表达各自独立的部分。
 
-### 2.2 NNC: Nonnegative Circuit
+这就是为什么论文常看 covariance matrix、correlation matrix、eigenvalue spectrum 和 effective dimension。它们都是在问：
 
-NNC 指 nonnegative circuit。它加入：
-
-```text
-y >= 0
-z >= 0
-```
-
-离散动力学类似：
-
-<div class="equation-block">
-  <div><span class="eq-left">y(τ + 1)</span><span class="eq-op">=</span><span>[y(τ) + η(-y - Wz + x)]₊</span></div>
-  <div><span class="eq-left">z(τ + 1)</span><span class="eq-op">=</span><span>[z(τ) + η(-Mz + ρ²Wᵀy)]₊</span></div>
-</div>
-
-其中：
-
-```text
-[a]_+ = max(0, a)
-```
-
-为什么重要？
-
-神经活动通常不能任意正负变化，NNC 更接近真实神经元活动。论文中 NNC 对 connectome 中 ORN-LN 权重的预测更有生物意义。
+> 输出 `y` 还会不会被少数几个共同方向支配？
 
 ---
 
-## 3. 去相关效果从哪里来
+## 2. 先用一个新手版比喻理解
 
-这里最容易误解。一个常见但不准确的说法是：
+把 `x` 想成一群学生一起交作业。每个学生有自己的答案，但他们里面有一段话是全班都差不多的套话。
 
-> `z` 学到前 `K` 个 PCA 特征，然后 `y` 等于 `x` 减去这 `K` 个方向。
+- 每个学生自己的答案：有用的个体差异。
+- 全班都差不多的套话：重复的共享结构。
+- 老师看多了以后发现：这段套话每次都出现。
+- 老师之后批改时会把套话的影响压低一点，让真正不同的部分更显眼。
 
-这个说法有一点直觉是对的：`z` 确实会主要响应输入中反复出现、方差大、相关性强的结构；`Wz` 也确实会反馈影响 `y`。但严格来说，它不是简单的 PCA 投影删除。更准确地说：
+在网络里：
 
-> LC / NNC 学到一个最多 `K` 维的辅助表示 `z`，这个辅助表示和 ORN 输出 `y` 共同满足 similarity matching 推导出的 saddle-point / circuit dynamics。网络对输入谱做的是方向依赖的连续压缩，而不是把前 `K` 个方向完全减掉。
+- `x` 是原始答案。
+- `z` 像“发现套话模式”的检查器。
+- `Wz` 是检查器反馈回来的“这部分像套话，要压一下”。
+- `y = x - γ²Wz` 就是被压过之后的输出。
 
-设输入 covariance 为：
+注意：这不是把套话整段删光。因为有时那段共同结构里也有有用信息。网络做的是压缩，不是清零。
 
-```text
-C_x = E[x x.T]
-```
+---
 
-如果输入中有很强的主方向：
+## 3. 为什么 `y` 能去掉 `x` 里的相关结构
 
-```text
-C_x = U diag(lambda_1, lambda_2, ..., lambda_N) U.T
-lambda_1 >> lambda_2 >> ...
-```
+### 3.1 第一步：相关结构就是“经常一起出现的方向”
 
-说明 ORN 表示里有少数方向占据大部分方差。这些方向可能对应：
+输入的 covariance 可以写成 `Cₓ = E[xxᵀ]`。
 
-- 总浓度轴。
-- 相似分子族共同激活。
-- 多个 ORN 的共享响应模式。
-- dominant molecular block。
+这句话的意思是：我们统计很多气味刺激下，ORN 活动 `x` 的哪些维度经常一起变化。
 
-### 3.1 直觉层面：为什么强相关方向会被压缩
+如果 `Cₓ` 有一个很大的 eigenvalue，意思就是：
 
-LN 的作用不是“复制 PCA component”，而是形成一组可以解释 ORN 输出中共享结构的辅助变量。
+> 在某个方向上，输入变化特别大；很多样本都沿着这个方向一起涨落。
 
-机制可以这样理解：
+这个方向可能对应总浓度，也可能对应某个分子族共同激活很多 ORN。
 
-```text
-强相关方向反复出现
-    ↓
-这些方向更容易驱动 LN activity z
-    ↓
-W 学到 y 和 z 之间稳定的相关关系
-    ↓
-当类似结构再次出现时，Wz 通过反馈项改变 y 的稳态
-    ↓
-高方差 / 高相关方向被压缩
-    ↓
-输出更去相关、更谱均衡
-```
+所以“强相关结构”不是神秘东西。它就是数据里反复出现、幅度很大、很多 ORN 一起参与的共同模式。
 
-注意这里说的是“压缩”，不是“删除”。如果把某个强方向完全删掉，样本之间的相似性结构会被严重破坏；similarity matching 不允许网络随便丢掉输入几何。网络做的是在“保留样本关系”和“降低冗余”之间折中。
+### 3.2 第二步：为什么 LN 会优先看到这些共同模式
 
-### 3.2 LC 的线性去相关：谱压缩而不是投影相减
+LN 的活动 `z` 是被 `Wᵀy` 驱动的。直觉上，`Wᵀy` 在问：
 
-LC 最适合用来理解原理，因为它没有非负约束，稳态解可以解析研究。
+> 当前输出 `y` 里面，有多少成分像我这个 LN 已经学到的模式？
 
-在一个已经学到稳定权重的 LC 中，给定输入 `x`，`y` 和 `z` 会达到稳态。把第一条方程写成稳态形式：
+如果某个模式在数据里经常出现、幅度又大，它就更容易反复驱动某些 LN。长期学习以后，`W` 会更稳定地对这些模式敏感。
 
-<div class="equation-block">
-  <div><span class="eq-left">0</span><span class="eq-op">=</span><span>-y - γ²Wz + x</span></div>
-  <div><span class="eq-left">y</span><span class="eq-op">=</span><span>x - γ²Wz</span></div>
-</div>
+这一步非常关键：
 
-这看起来像“从 `x` 中减去 `Wz`”，但关键是 `z` 不是预先固定的 PCA 坐标，而是同时由第二条稳态方程决定：
+> `z` 不是手动算出来的 PCA 坐标，但它会被高方差、强相关、反复出现的结构强烈驱动。
 
-<div class="equation-block">
-  <div><span class="eq-left">Mz</span><span class="eq-op">=</span><span>(ρ² / γ²)Wᵀy</span></div>
-</div>
+所以你觉得“`z` 好像学到了前 K 个特征空间”，这个直觉有一部分对：它确实倾向于捕捉主导共享结构。
 
-所以 `y` 和 `z` 是互相耦合求出来的。`z` 依赖 `y`，`y` 又被 `z` 反馈改变。它不是先算出 `z = PCA(x)`，再做 `y = x - projection`。
+但它不等于 PCA 里的“前 K 个 component”。它是由电路动力学、非负约束、`W`、`M`、`ρ`、`γ` 共同决定的 LN 活动。
 
-从谱的角度看，LC 的作用更像：
+### 3.3 第三步：为什么被 LN 看到以后，`y` 里的相关结构会变小
 
-```text
-输入方向 i 的强度 s_i
-    ↓
-经过一个由 rho、K、输入统计决定的 shrinkage function
-    ↓
-输出方向 i 的强度 y_i
-```
+LC 的第一条稳态关系可以写成：
 
-高强度方向被压得更多，弱方向被压得较少。因此 covariance spectrum 会变平：
+> `y = x - γ²Wz`
 
-```text
-大的 eigenvalue 下降较多
-小的 eigenvalue 相对保留
-effective dimension 上升
-off-diagonal correlation 下降
-```
+这句话可以慢慢读：
 
-这就是 LC 的去相关原理。
+- `x` 是原始输入。
+- `Wz` 是 LN 根据当前模式产生的反馈信号。
+- `γ²Wz` 是反馈强度。
+- `y` 是输入减去这部分反馈后的输出。
 
-### 3.3 `K` 到底是什么意思
+如果某个共享模式很强，它会强烈驱动 `z`。`z` 一强，`Wz` 也强。于是这个共享模式在 `y` 里被压得更多。
 
-`K` 是 LN 数量，也就是 `z` 的维度。它限制了网络可以使用多少个辅助变量来解释和压缩共享结构。
+如果某个方向本来就弱、不是很多 ORN 共同参与，它驱动 `z` 不强，反馈也弱，于是它在 `y` 里被保留得更多。
+
+所以整个过程像这样：
+
+1. `x` 里有一个经常出现的共同模式。
+2. 这个共同模式让多个 ORN 一起变大，因此 covariance 里出现强方向。
+3. 强方向更容易激活 LN，也更容易被 `W` 学到。
+4. LN 被激活后，通过 `Wz` 反馈到 ORN output。
+5. 反馈项在 `y = x - γ²Wz` 里把这个共同模式压小。
+6. 共同模式压小后，通道之间就没那么一起涨落了。
+7. 因此 `y` 的 correlation matrix 更接近对角，spectrum 更平，effective dimension 更高。
+
+这就是“输出 `y` 能去掉 `x` 中相关性结构”的核心原因。
+
+更短地说：
+
+> 强相关结构会更容易驱动 LN；LN 又专门反馈抑制它驱动到的结构；所以强相关结构在输出 `y` 中被优先压缩。
+
+### 3.4 但 `y` 不是 `x` 减去前 K 个 PCA 方向
+
+这个区别很重要。
+
+错误理解：
+
+> `z` 等于前 `K` 个 PCA features，`y` 等于 `x` 减去这些 features。
+
+更准确的理解：
+
+> `z` 是一个 `K` 维的侧向活动空间，它倾向于表示输入中强、常见、共享的模式。`y` 是在 `x` 和 LN feedback 互相耦合后得到的平衡输出。
+
+为什么不能说成“直接减去前 K 个 PCA 方向”？
+
+1. PCA 是先全局计算 `Cₓ`，再显式求 eigenvectors。这个网络不是这样做的。
+2. `z` 不是只由 `x` 决定，而是由当前的 `y`、`W`、`M` 和反馈平衡共同决定。
+3. `Wz` 不是硬投影删除，而是连续的 feedback shrinkage。
+4. NNC 里还有 `y ≥ 0` 和 `z ≥ 0`，因此它更像非负特征或 soft cluster，而不是普通线性 PCA 坐标。
+
+所以你可以把它理解成：
+
+> PCA whitening 是工程上“先算清楚所有方向，再精确除以每个方向的标准差”。
+
+> LC / NNC 是生物回路里“用 LN 学到常见共享模式，再用反馈把这些模式压下去”。
+
+这两个结果可能相似，但实现方式不同。
+
+---
+
+## 4. LC 的去相关原理
+
+LC 指 linear circuit。活动方程是：
+
+- `dy/dτ = -y - γ²Wz + x`
+- `dz/dτ = -Mz + (ρ² / γ²)Wᵀy`
+
+看第一条：
+
+> `dy/dτ = -y - γ²Wz + x`
+
+它包含三股力量：
+
+| 项 | 作用 |
+| --- | --- |
+| `+x` | 原始 ORN soma 输入把 `y` 往上推 |
+| `-y` | 活动自身衰减，防止无限变大 |
+| `-γ²Wz` | LN 反馈抑制，把学到的共享模式压下去 |
+
+看第二条：
+
+> `dz/dτ = -Mz + (ρ² / γ²)Wᵀy`
+
+它也包含几股力量：
+
+| 项 | 作用 |
+| --- | --- |
+| `Wᵀy` | 当前 `y` 有多像每个 LN 学到的模式 |
+| `ρ² / γ²` | 调节 `y` 驱动 `z` 的相对强度 |
+| `-Mz` | LN-LN 竞争，避免所有 LN 都学同一个东西 |
+
+所以 LC 的逻辑是：
+
+1. `x` 推动 `y`。
+2. `y` 驱动 `z`。
+3. `z` 通过 `Wz` 反过来抑制 `y`。
+4. 反复出现的高方差方向会产生更强反馈。
+5. 这些方向在 `y` 里被压缩。
+
+这叫 partial decorrelation 或 partial whitening。它不是完整 whitening，因为它不会保证 `Cᵧ = I`。
+
+---
+
+## 5. NNC 的去相关原理
+
+NNC 指 nonnegative circuit。它和 LC 很像，但多了非负约束：
+
+> `y ≥ 0`，`z ≥ 0`
+
+离散形式可以写成：
+
+- `y(τ + 1) = [y(τ) + η(-y - Wz + x)]₊`
+- `z(τ + 1) = [z(τ) + η(-Mz + ρ²Wᵀy)]₊`
+
+其中 `[a]₊ = max(0, a)`。
+
+非负约束会改变直觉。LC 里的 `z` 可以正负变化，所以更像线性子空间变量；NNC 里的 `z` 只能非负，所以更像：
+
+- 某类 odor feature 的激活强度。
+- 当前气味属于某个 soft cluster 的程度。
+- 某组 ORN 共同活动模式的“存在量”。
+
+所以 NNC 的去相关可以这样理解：
+
+1. 某个气味来了，激活一组 ORN。
+2. 如果这个 ORN pattern 很像过去常见的某个模式，对应的 LN `z` 会变大。
+3. 这个 LN 通过 `Wz` 抑制相关 ORN output。
+4. 常见模式被压缩，剩下的输出更强调差异部分。
+5. 因为 `z` 非负，它更像“这个模式出现了多少”，而不是“沿 PCA 轴的正负坐标”。
+
+因此 NNC 的一句话解释是：
+
+> NNC 用非负 LN feature / soft cluster 来识别常见 ORN 活动模式，再用模式特异性的反馈抑制降低冗余。
+
+---
+
+## 6. `K` 越大为什么常常效果越好
+
+你观察到 `K` 越大，去相关效果确实更好，这个现象很合理。
+
+`K` 是 LN 的数量，也就是 `z` 的维度。它决定网络有多少个“侧向检查器”可以去发现共享模式。
+
+可以这样想：
+
+| `K` | 网络能做什么 |
+| ---: | --- |
+| `K = 0` | 没有 LN 反馈，`y` 基本就是 `x`，相关结构还在 |
+| `K = 1` | 只能重点压一个最明显的共同模式，比如总浓度轴 |
+| `K = 5` | 可以压几个共同模式，比如浓度轴加几个分子族轴 |
+| `K` 更大 | 可以覆盖更多高方差 / 高相关方向 |
+
+所以在输入确实有多个共享相关方向时，`K` 增大通常会让去相关变强。原因不是“数学上强行删除更多 PCA component”，而是：
+
+> LN 通道更多，网络可以学到并反馈压缩更多种共享模式。
+
+但这里也有边界。
+
+`K` 越大不一定永远越好，因为：
+
+1. 如果主要相关结构已经被前几个 LN 处理了，再增加 `K` 的收益会变小。
+2. 如果 `K` 太大而数据样本不够，网络可能学到噪声或不稳定模式。
+3. 如果反馈太强，可能把任务相关的信息也压掉。
+4. 真正压缩多强还取决于 `ρ`、`γ`、学习率和输入统计。
+
+所以更准确的说法是：
+
+> 在共享相关结构较多、学习稳定、参数合适时，较大的 `K` 通常带来更强的 partial decorrelation；但它增加的是反馈容量，不是保证输出维度等于 `K`，也不是保证越大越无限好。
+
+---
+
+## 7. 参数对去相关的影响
+
+### 7.1 `K`：能处理多少类共享模式
+
+`K` 控制 LN population 的容量。
+
+- `K` 小：只能压最强、最明显的相关方向。
+- `K` 大：可以压更多相关方向。
+- `K` 太大：收益可能饱和，也可能受样本量和噪声影响。
+
+可以把 `K` 叫做“可学习共享模式的数量上限”，不要直接叫“PCA component 数量”。
+
+### 7.2 `ρ`：压缩强度和输入尺度的相对参数
+
+`ρ` 控制 `y` 驱动 `z` 的强度，也影响反馈压缩的有效强度。
+
+直觉上：
+
+- `ρ` 太小：LN 不够活跃，反馈弱，去相关弱。
+- `ρ` 适中：主导共享方向被明显压缩。
+- `ρ` 太大：压缩可能过强，活动尺度和稳定性可能受影响。
+
+所以 `ρ` 不是简单的“越大越好”，而是控制 partial whitening 的强度。
+
+### 7.3 `γ`：反馈尺度和活动尺度匹配
+
+在 LC 里，`γ` 同时出现在 `γ²Wz` 和 `(ρ² / γ²)Wᵀy` 里。
+
+它影响：
+
+- `z` 对 `y` 的反馈强度。
+- `y` 对 `z` 的驱动强度。
+- 权重和活动的尺度匹配。
+- 动力学稳定性。
+
+所以 `γ` 更像电路实现中的尺度参数，不是单独的“去相关按钮”。
+
+### 7.4 `W` 和 `M`：一个学 ORN-LN 模式，一个学 LN-LN 竞争
+
+慢学习规则的直觉是：
+
+> `W` 学 `y` 和 `z` 的共同活动；`M` 学 `z` 和 `z` 的共同活动。
+
+`W` 让 LN 知道哪些 ORN 输出模式经常一起出现。
+
+`M` 让 LN 之间相互竞争，避免所有 LN 都表示同一个最强模式。
+
+没有 `M` 的竞争，多个 LN 可能都盯着同一个 dominant direction，容量被浪费。
+
+有了 `M`，不同 LN 更容易分工，覆盖多个共享结构。
+
+---
+
+## 8. 怎么判断模型真的去相关了
+
+不要只看分类准确率。去相关和分类准确率不是一个东西。
+
+如果 LC / NNC 真的让表示更去相关，你应该看到：
+
+| 指标 | 期待变化 |
+| --- | --- |
+| mean absolute off-diagonal correlation | 下降 |
+| covariance eigenvalue spectrum | 更平 |
+| explained variance of PC1 | 下降 |
+| effective dimension | 上升 |
+| correlation heatmap | 非对角线变淡 |
+| PCA scatter | 不再被单一方向强烈拉长 |
+
+分类准确率可能上升，也可能不明显。原因是：
+
+> 去相关改善的是表示效率和冗余结构；分类准确率还取决于标签边界是否刚好受益于这种几何改变。
+
+如果标签本来就沿着 ORN 的高方差方向很好分开，强行压缩这个方向不一定提高分类。
+
+---
+
+## 9. 最容易混淆的四句话
+
+### 混淆 1：`z` 是不是 PCA 的前 `K` 个成分？
+
+不是。
 
 更准确地说：
 
-```text
-K 不是“前 K 个 PCA 方向”的硬编码数量
-K 是网络可学习的辅助子空间维度上限
-```
+> `z` 是一个由电路学习出来的 `K` 维侧向活动，它倾向于响应输入中的主导共享结构。
 
-当输入谱很陡时，最容易被学到的通常确实是高方差、高相关、反复出现的方向，所以它看起来像在处理前几个 principal directions。但这只是结果上的相似，不是算法上显式 PCA。
+它可能和 PCA 主方向相似，但不是显式 PCA。
 
-因此应该避免写成下面这种硬投影解释：
-
-<div class="equation-block">
-  <div><span class="eq-left">z</span><span class="eq-op">≠</span><span>前 K 个 PCA 特征</span></div>
-  <div><span class="eq-left">y</span><span class="eq-op">≠</span><span>x 减去前 K 个 PCA 特征</span></div>
-</div>
-
-更稳妥的写法是：
-
-> `z` spans a learned K-dimensional auxiliary subspace that captures dominant shared structure in the activity.
->
-> `y` is the circuit output after direction-dependent feedback shrinkage, not after hard removal of those directions.
-
-中文：
-
-> `z` 张成的是一个由数据统计和电路约束共同学习出的 `K` 维辅助子空间，它倾向于捕捉 ORN 活动中的主导共享结构；`y` 则是在反馈耦合下得到的压缩后输出，而不是简单删除这些方向后的残差。
-
-### 3.4 NNC 的去相关：带非负约束的特征提取和软聚类
-
-NNC 加入非负性：
-
-```text
-y >= 0
-z >= 0
-```
-
-这会改变解释。
-
-LC 中的 `z` 可以正负变化，因此更像线性子空间变量。NNC 中的 `z` 只能非负，所以它更像：
-
-- 某类 odor feature 的激活强度；
-- ORN activity pattern 的 soft cluster membership；
-- 若干 LN type 对不同输入模式的非负响应。
-
-因此 NNC 的去相关不是“线性投影到 PCA 子空间再减掉”，而是：
-
-1. 输入 `x` 激活某些 LN feature `z`。
-2. 这些 `z` 表示当前 odor 属于哪些常见活动模式 / soft cluster。
-3. LN 通过 `Wz` 对 ORN axon output `y` 产生模式特异性抑制。
-4. 常见共享模式被归一化或压缩。
-5. 输出 `y` 的冗余降低。
-
-所以 NNC 的效果更像：
-
-```text
-partial whitening + normalization + feature extraction
-```
-
-它不仅降低线性相关性，也把输入组织成若干可解释的非负特征。这也是为什么 Chapochnikov 论文会说 LNs encode soft cluster memberships of ORN activity。
-
-### 3.5 LC 和 NNC 的区别一句话
-
-LC：
-
-> 通过线性稳态动力学对输入谱做方向依赖的 shrinkage，最适合理解 partial decorrelation 的数学原理。
-
-NNC：
-
-> 在类似目标下加入非负约束，使 LN 活动更像 soft cluster / feature membership，去相关同时伴随归一化和可解释特征提取。
-
----
-
-## 4. 为什么是“部分去相关”，不是完整 PCA whitening
-
-PCA whitening 做的是：
-
-```text
-1. 计算输入 covariance
-2. 找到所有 principal components
-3. 旋转到 PCA 坐标
-4. 每个方向除以 sqrt(lambda_i)
-5. 输出 covariance 变成 identity
-```
-
-所以 PCA whitening 的理想结果是：
-
-```text
-C_y = I
-```
-
-但 LC / NNC 网络不是这样做的。
-
-它受到这些限制：
-
-1. LN 数量有限，记作 `K`。
-2. 网络通过动态反馈压缩主方向，不是显式除以 `sqrt(lambda_i)`。
-3. 压缩形式通常是 nonlinear shrinkage。
-4. NNC 还有非负性约束。
-5. 学习规则是局部的、在线的，依赖样本统计。
-
-所以更准确的表述是：
-
-> The circuit partially whitens and normalizes ORN representations through inhibitory feedback.
-
-中文：
-
-> 该回路通过抑制性反馈对 ORN 表示进行部分白化和归一化。
-
-但在你的论文里更稳妥的说法是：
-
-> 它实现的是部分去相关 / 部分谱均衡，而不是严格 PCA whitening。
-
----
-
-## 5. 参数怎么影响去相关
-
-### 5.1 K：LN 数量，也就是可处理的方向数
-
-`K` 是 LN / lateral units 数量。
-
-直觉：
-
-```text
-K 越大，网络理论上可以捕捉和抑制更多主导方向。
-```
-
-但：
-
-```text
-K = 50 不等于 effective dimension = 50
-```
-
-原因：
-
-- `K` 只是 lateral population 的容量。
-- 实际学到哪些方向取决于输入谱、样本数、学习动态。
-- 每个方向压缩多强取决于 `rho`。
-- 输入本来很干净时，增加 K 的边际收益会变小。
-
-### 5.2 rho：谱压缩强度
-
-`rho` 是最关键的去相关强度参数之一。
-
-补充材料里提到 scaling `X` 和 scaling `rho` 有等价关系，这说明 `rho` 实际上控制的是输入强度与网络压缩强度之间的相对尺度。
-
-直觉：
-
-```text
-rho 小：feedback/shrinkage 弱，y 接近 x
-rho 中等：主导方向被压缩，ED 上升，correlation 下降
-rho 太大：可能过度压缩，任务相关方差信息也被削弱
-```
-
-注意：
-
-```text
-rho -> infinity 不等于 exact whitening
-```
-
-因为它不是 PCA 的 `1/sqrt(lambda_i)` 缩放。
-
-### 5.3 gamma：实现尺度参数
-
-`gamma` 出现在：
-
-<div class="equation-block">
-  <div><span class="eq-left">dy/dτ</span><span class="eq-op">=</span><span>-y - γ²Wz + x</span></div>
-  <div><span class="eq-left">dz/dτ</span><span class="eq-op">=</span><span>-Mz + (ρ² / γ²)Wᵀy</span></div>
-</div>
-
-它同时改变：
-
-- `z` 对 `y` 的 feedback 强度。
-- `y` 对 `z` 的 drive 强度。
-
-所以 `gamma` 不是单纯的“越大越去相关”。它更像电路实现中的尺度匹配参数，会影响活动幅度、权重尺度、时间常数和稳定性。
-
-### 5.4 学习率 eta
-
-突触更新：
-
-<div class="equation-block">
-  <div><span class="eq-left">W</span><span class="eq-op">←</span><span>W + η₁(yzᵀ - W)</span></div>
-  <div><span class="eq-left">M</span><span class="eq-op">←</span><span>M + η₂(zzᵀ - M)</span></div>
-</div>
-
-解释：
-
-- `y z.T` 是 Hebbian term。
-- `z z.T` 学到 LN 内部相关结构。
-- `-W` 和 `-M` 是衰减项，防止权重无限增长。
-
-学习率太小：
-
-- 学得慢。
-- 需要更多 odor samples。
-
-学习率太大：
-
-- 可能追着单个样本波动。
-- 学到噪声方向。
-- 稳态不稳定。
-
----
-
-## 6. 你论文里的诊断指标怎么解释
-
-你现在图里常用指标：
-
-| 指标 | 说明 |
-| --- | --- |
-| Effective dimension | 方差是否分散到更多维度 |
-| Mean abs offdiag correlation | 平均通道相关性 |
-| Max abs offdiag correlation | 最强残余相关 |
-| PC1 + PC2 | 前两个主成分是否支配表示 |
-
-如果 LC 有去相关效果，你应该看到：
-
-```text
-Effective dimension 上升
-mean abs offdiag correlation 下降
-max abs offdiag correlation 下降
-PC1 + PC2 explained variance 下降
-```
-
-但不要只看分类准确率。
-
-去相关和分类准确率不是同一个目标：
-
-```text
-去相关 = 表示效率 / 冗余降低
-分类准确率 = 当前标签、噪声、读出器共同决定
-```
-
-如果标签本来就沿着 ORN 的高方差方向很好分开，强行去相关可能不会提升分类，甚至略降。
-
-所以你的论文里可以写：
-
-> LC preprocessing improves representational efficiency by reducing redundancy and flattening the response spectrum. However, this improvement does not necessarily translate into higher classification accuracy, because downstream performance depends on the alignment between task labels and the variance structure of the input representation.
-
----
-
-## 7. 推荐研读顺序
-
-### 第 1 遍：只读问题和结论
-
-读 Chapochnikov 2023 主文：
-
-1. Abstract
-2. Significance statement
-3. Introduction 中关于 ORN-LN preprocessing 的动机
-4. Fig. 1 电路结构
-5. Fig. 4 或涉及模型结果的部分
-
-目标：
-
-```text
-知道这个网络为什么被提出：
-connectome + activity + similarity matching -> adaptive circuit
-```
-
-### 第 2 遍：读电路公式
-
-重点看：
-
-- LC equations
-- NNC equations
-- Synaptic plasticity equations
-
-问自己：
-
-```text
-x, y, z 分别是什么？
-W, M 分别是什么？
-公式 6 是给定 W/M 后的快速活动动力学吗？
-公式 8 是跨样本更新 W/M 的慢学习规则吗？
-```
-
-答案：
-
-> 是。活动动力学是单个 stimulus 下的 fast inference；突触更新是多个 stimulus 上的 slow learning。
-
-### 第 3 遍：读补充材料
-
-重点看：
-
-- Optimization problem
-- Equivalence of scaling X and rho
-- Circuit dynamical equations
-- Steady-state solution and stability
-- Effect of rho and gamma
-
-目标：
-
-```text
-理解 rho/gamma 不是随便调参，而是电路计算和实现尺度的一部分。
-```
-
-### 第 4 遍：读 Pehlevan 2018
-
-重点不是所有数学细节，而是：
-
-```text
-为什么 similarity matching 可以导出局部 Hebbian / anti-Hebbian 网络？
-```
-
-你只需要抓住：
-
-- 全局目标：保持 pairwise similarity。
-- 变量替换：把全局目标拆成局部可优化形式。
-- 神经解释：突触只需要 pre/post 活动。
-- 结果：Hebbian feedforward / anti-Hebbian lateral competition。
-
----
-
-## 8. 最容易混淆的点
-
-### 混淆 1：公式 6 和公式 8 是不是同一件事？
+### 混淆 2：`y` 是不是 `x` 减去前 `K` 个主成分？
 
 不是。
 
-公式 6 / 7：
+更准确地说：
 
-```text
-给定当前 W, M 和当前输入 x
-求 y, z 的稳态活动
-```
+> `y` 是 `x` 在 LN feedback 下达到平衡后的输出；强共享模式被连续压缩，而不是被硬删除。
 
-这是 fast inference。
+### 混淆 3：`K` 越大是不是一定越好？
 
-公式 8：
+不一定，但常常会更好。
 
-```text
-用当前得到的 y, z 更新 W, M
-```
+如果输入里有很多共享相关方向，更多 LN 能处理更多模式，所以去相关增强。
 
-这是 slow learning。
+但如果主要共享结构已经处理完，或者数据噪声很大，再增加 `K` 的收益会下降。
 
-### 混淆 2：LN 是不是直接等于 PCA component？
+### 混淆 4：LC / NNC 是不是完整 whitening？
 
 不是。
 
-LN activity `z` 可以理解为学到主导特征或 soft cluster membership，但它不是手动 PCA 之后的 component。
+完整 PCA whitening 会让 `Cᵧ = I`。LC / NNC 更适合说成：
 
-### 混淆 3：去相关是不是一定提高分类准确率？
+> partial whitening, normalization, and decorrelation。
 
-不是。
+中文就是：
 
-去相关改善的是表示几何和效率。分类准确率取决于任务标签是否受益于这种几何改变。
-
-### 混淆 4：LC 是不是 whitening？
-
-不是严格 whitening。更准确：
-
-```text
-LC / NNC performs partial whitening, normalization, and decorrelation.
-```
-
-论文里如果想稳妥：
-
-```text
-partial decorrelation / partial spectral equalization
-```
+> 部分白化、归一化和去相关。
 
 ---
 
-## 9. 可以写进你论文的中文解释
+## 10. 可以直接写进论文的版本
 
-自适应预处理网络可以被理解为一种由 similarity matching 原理推导出的 ORN-LN 回路。该网络的目标不是简单复制输入，也不是显式执行 PCA 白化，而是在保留气味样本相似性结构的同时，通过局部 Hebbian 学习和 LN 间抑制性竞争，自适应地学习输入活动中的主导相关方向。对于单个气味刺激，给定当前突触权重后，ORN 轴突活动和 LN 活动通过快速动力学达到稳态；在多个气味样本呈现过程中，ORN-LN 和 LN-LN 权重则根据局部活动相关性缓慢更新。由于高方差共享方向更容易驱动 LN 活动，这些方向会被 LN 反馈抑制项优先压缩，从而降低 ORN 输出表示中的通道相关性，提高有效维度，并使协方差谱更加均衡。因此，该网络的去相关作用应理解为受生物电路约束的部分去相关或部分白化，而不是严格的 PCA whitening。
+自适应预处理网络可以理解为一种由 similarity matching 原理推导出的 ORN-LN 回路。该网络并不显式计算 PCA，也不直接删除输入的前 `K` 个主成分；相反，它通过 ORN 输出活动 `y` 与侧向 LN 活动 `z` 之间的快速反馈动力学，以及 ORN-LN、LN-LN 突触的慢速局部学习，逐渐捕捉输入表示中反复出现的高方差共享结构。由于这些共享结构更容易驱动 LN 活动，它们会通过 `Wz` 反馈项在 ORN axon output 中被优先压缩，从而降低通道间相关性、平坦化协方差谱，并提高表示的有效维度。因此，该模型的去相关作用应理解为生物可实现的部分去相关或部分白化，而不是严格的 PCA whitening。参数 `K` 控制侧向群体能够表示的共享模式数量上限；较大的 `K` 通常允许网络压缩更多主导相关方向，但最终效果仍取决于输入统计、`ρ`、`γ`、学习动态和非负约束。
 
 ---
 
-## 10. 一句话复习版
+## 11. 一句话记忆
 
-> 这个自适应预处理网络通过 similarity matching 保留气味样本之间的几何关系，同时用 LN 学到并反馈抑制 ORN 表示中的主导相关方向；因此它能降低冗余、提高 effective dimension、实现部分去相关，但它不是精确 PCA whitening，且去相关是否提高分类准确率取决于具体任务和输入统计。
+> `z` 不是 PCA component，而是一组会被常见共享模式激活的 LN feedback handles；`y` 不是把这些方向硬删掉后的残差，而是把强相关模式压小后的 ORN 输出。
