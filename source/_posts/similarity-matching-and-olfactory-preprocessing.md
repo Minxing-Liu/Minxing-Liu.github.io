@@ -54,17 +54,17 @@ z(t): lateral interneuron / feature activity
 
 The lateral population `z` is not just a nuisance variable. It represents the dominant features or directions that the circuit uses to reshape the output code. The recurrent and reciprocal interactions can be written schematically as:
 
-```text
-dy/dtau = -y - gamma^2 W z + x
-dz/dtau = -M z + (rho^2 / gamma^2) W.T y
-```
+<div class="equation-block">
+  <div><span class="eq-left">dy/dτ</span><span class="eq-op">=</span><span>-y - γ²Wz + x</span></div>
+  <div><span class="eq-left">dz/dτ</span><span class="eq-op">=</span><span>-Mz + (ρ² / γ²) Wᵀy</span></div>
+</div>
 
 with slow activity-dependent updates:
 
-```text
-W <- W + eta * (y z.T - W)
-M <- M + eta * (z z.T - M)
-```
+<div class="equation-block">
+  <div><span class="eq-left">W</span><span class="eq-op">←</span><span>W + η(yzᵀ - W)</span></div>
+  <div><span class="eq-left">M</span><span class="eq-op">←</span><span>M + η(zzᵀ - M)</span></div>
+</div>
 
 The exact constants matter for implementation, but the intuition is simpler:
 
