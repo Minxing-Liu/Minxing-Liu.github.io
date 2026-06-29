@@ -1,0 +1,160 @@
+\chapter{热力学基本规律}
+
+\section{学习目标}
+
+热力学部分的核心不是背很多公式，而是建立三个层次的对应关系：
+\begin{enumerate}
+  \item 平衡态如何用少量宏观变量描述；
+  \item 热、功和内能如何在过程中转化；
+  \item 熵、自由能和热力学势如何给出过程方向与平衡判据。
+\end{enumerate}
+
+\begin{keybox}
+\textbf{考试抓手：}看到热力学题，先判断过程约束：孤立、绝热、等温、等压、等容、可逆还是不可逆。约束决定该用 $U,S,F,G,H$ 中哪一个势函数。
+\end{keybox}
+
+\section{1.1 平衡态与状态参量}
+
+热力学系统由大量微观粒子组成。宏观上若系统性质不随时间改变，且不存在宏观流动或不可忽略的非均匀性，就称为平衡态。平衡态可由少数状态参量描述，例如
+\[
+  P,\quad V,\quad T,\quad N,\quad U,\quad S .
+\]
+
+状态量只依赖状态，与到达该状态的路径无关；热量 $Q$ 和功 $W$ 是过程量，只在具体过程中有定义。因此常写成
+\[
+  \dd U \quad \text{是全微分}, \qquad \delta Q,\ \delta W \quad \text{不是全微分}.
+\]
+
+\subsection*{物态方程}
+
+平衡态参量之间一般不独立，关系式称为物态方程。理想气体为
+\[
+  PV = nRT = Nk_{\mathrm B}T .
+\]
+它不是热力学第一、第二定律推出的普遍规律，而是具体物质模型的输入。做题时不要把理想气体公式误用到任意系统。
+
+\section{1.2 热平衡定律与温度}
+
+热平衡定律，即热力学第零定律：若系统 $A$ 与 $C$ 热平衡，$B$ 与 $C$ 热平衡，则 $A$ 与 $B$ 热平衡。它保证了温度可以作为判定热平衡的状态函数。
+
+统计物理中，温度更深层的定义来自熵对能量的导数：
+\[
+  \frac{1}{T} = \pdc{S}{U}{V,N}.
+\]
+两个可交换能量的系统达到热平衡时，总熵取极大：
+\[
+  \dd S_{\rm tot}
+  = \pdc{S_1}{U_1}{}\dd U_1
+  + \pdc{S_2}{U_2}{}\dd U_2 = 0,\qquad \dd U_2=-\dd U_1 ,
+\]
+因此
+\[
+  \frac{1}{T_1}=\frac{1}{T_2}.
+\]
+
+\begin{keybox}
+\textbf{物理图像：}温度不是“含热量”的多少，而是熵随能量增加的斜率。热量从高温流向低温，是因为这样总熵增加。
+\end{keybox}
+
+\section{1.3 准静态过程与可逆过程}
+
+准静态过程是由一连串无限接近平衡态的状态组成的理想过程。可逆过程比准静态更强：不仅系统经历平衡态，还要求没有耗散、摩擦、有限温差传热等不可逆因素。
+
+常见过程：
+\begin{itemize}
+  \item 等温过程：$T=\mathrm{const.}$；
+  \item 等容过程：$V=\mathrm{const.}$；
+  \item 等压过程：$P=\mathrm{const.}$；
+  \item 绝热过程：$\delta Q=0$；
+  \item 可逆绝热过程：$\delta Q=0$ 且 $\dd S=0$。
+\end{itemize}
+
+对可逆过程，有
+\[
+  \delta Q_{\rm rev}=T\dd S .
+\]
+这个式子不能直接用于不可逆过程。不可逆过程中仍有状态量差值 $\Delta S$，但不能简单把实际吸热写作 $T\dd S$。
+
+\section{1.4 功}
+
+体积功的符号约定必须固定。本笔记采用“系统对外做功为正”：
+\[
+  \delta W = P\dd V .
+\]
+则热力学第一定律写作
+\[
+  \dd U = \delta Q - \delta W = \delta Q - P\dd V .
+\]
+若采用“外界对系统做功为正”，符号会变成 $\dd U=\delta Q+\delta W_{\rm on}$。考试中最常见的错误就是混用两套符号。
+
+对可逆过程：
+\[
+  \dd U = T\dd S - P\dd V .
+\]
+若还允许粒子数变化，则
+\[
+  \dd U = T\dd S - P\dd V + \mu\dd N .
+\]
+
+\section{热力学第一定律}
+
+第一定律是能量守恒：
+\[
+  \Delta U = Q-W .
+\]
+对理想气体，内能只与温度有关：
+\[
+  U = \frac{f}{2}Nk_{\mathrm B}T,\qquad C_V=\pdc{U}{T}{V}.
+\]
+单原子理想气体 $f=3$，所以 $U=\frac{3}{2}Nk_{\mathrm B}T$。
+
+\section{热力学第二定律与熵}
+
+第二定律有多种等价表述：
+\begin{itemize}
+  \item Kelvin 表述：不可能从单一热源吸热并完全转化为功而不产生其他影响；
+  \item Clausius 表述：热量不可能自发地从低温物体传到高温物体；
+  \item 熵表述：孤立系统熵不减少。
+\end{itemize}
+
+Clausius 不等式：
+\[
+  \oint \frac{\delta Q}{T}\le 0 .
+\]
+对可逆循环取等号，并定义
+\[
+  \dd S = \frac{\delta Q_{\rm rev}}{T}.
+\]
+对任意过程：
+\[
+  \Delta S \ge \int_A^B\frac{\delta Q}{T}.
+\]
+孤立系统 $\delta Q=0$，所以
+\[
+  \Delta S\ge 0 .
+\]
+
+\section{自由能与平衡判据}
+
+Helmholtz 自由能：
+\[
+  F = U-TS,\qquad \dd F=-S\dd T-P\dd V+\mu\dd N .
+\]
+在等温等容条件下，自发过程满足
+\[
+  \Delta F\le 0.
+\]
+
+Gibbs 自由能：
+\[
+  G = U-TS+PV,\qquad \dd G=-S\dd T+V\dd P+\mu\dd N .
+\]
+在等温等压条件下，自发过程满足
+\[
+  \Delta G\le 0.
+\]
+
+\begin{keybox}
+\textbf{记忆方式：}$U(S,V,N)$ 用于孤立或能量表述；$F(T,V,N)$ 用于等温等容；$G(T,P,N)$ 用于等温等压；巨势 $\Phi(T,V,\mu)$ 用于与粒子库接触。
+\end{keybox}
+

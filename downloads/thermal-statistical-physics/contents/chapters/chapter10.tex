@@ -1,0 +1,76 @@
+\chapter{涨落理论与复习路线}
+
+\section{正则系综中的能量涨落}
+
+正则系综中
+\[
+  U=\avg{E}=-\frac{\partial}{\partial\beta}\ln Z.
+\]
+能量涨落为
+\[
+  \avg{(\Delta E)^2}
+  =\avg{E^2}-\avg{E}^2
+  =\frac{\partial^2}{\partial\beta^2}\ln Z.
+\]
+利用热容定义可得
+\[
+  \avg{(\Delta E)^2}=\kb T^2 C_V.
+\]
+这说明热容本质上是能量涨落的响应。
+
+\section{巨正则系综中的粒子数涨落}
+
+巨正则系综中
+\[
+  \avg{N}
+  =\frac{1}{\beta}\pdc{\ln\Xi}{\mu}{T,V}.
+\]
+粒子数涨落为
+\[
+  \avg{(\Delta N)^2}
+  =\frac{1}{\beta^2}\frac{\partial^2 \ln\Xi}{\partial\mu^2}
+  =\kb T\pdc{\avg{N}}{\mu}{T,V}.
+\]
+对普通宏观系统，
+\[
+  \frac{\sqrt{\avg{(\Delta N)^2}}}{N}\sim N^{-1/2}.
+\]
+
+\section{涨落-响应关系}
+
+许多响应函数都可看作涨落：
+\[
+  C_V=\frac{\avg{(\Delta E)^2}}{\kb T^2},
+\]
+\[
+  \kappa_T
+  \propto \frac{\avg{(\Delta N)^2}}{N\kb T}
+  \quad \text{或与体积涨落相关}.
+\]
+接近临界点时，相关长度增大，涨落增强，响应函数可能发散。这是本科相变与高等统计物理临界现象之间的桥梁。
+
+\section{本科热统到高统的复习路线}
+
+建议把这门基础课压缩成四条线：
+\begin{enumerate}
+  \item 热力学势线：$U,F,G,H,\Omega$ 及其自然变量；
+  \item 计数线：$\micro,W,Z,\Xi$ 与熵、自由能；
+  \item 分布线：Boltzmann, Bose, Fermi；
+  \item 涨落线：热容、压缩率、粒子数涨落和临界行为。
+\end{enumerate}
+
+如果目标是服务高等统计物理，最优先掌握：
+\[
+  S=\kb\ln\micro,\qquad
+  p_i=\frac{e^{-\beta E_i}}{Z},\qquad
+  F=-\kb T\ln Z,
+\]
+\[
+  \Xi=\sum_N e^{\beta\mu N}Z_N,\qquad
+  \Phi=-\kb T\ln\Xi,\qquad
+  \avg{(\Delta E)^2}=\kb T^2 C_V.
+\]
+
+\begin{keybox}
+\textbf{复习判断标准：}看到一个体系，能说出它的宏观约束、该选哪个系综、配分函数怎么写、自由能怎么取、涨落对应哪个响应函数，就已经具备进入高统的基础。
+\end{keybox}

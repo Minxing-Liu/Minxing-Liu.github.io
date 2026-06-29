@@ -1,0 +1,30 @@
+Advanced Statistical Mechanics review materials
+
+The baseline lecture-note PDF and reference-sheet PDF in this folder refer to
+the public Muatyz/review-sheet repository:
+
+https://github.com/Muatyz/review-sheet/tree/main/%E9%AB%98%E7%AD%89%E7%BB%9F%E8%AE%A1%E7%89%A9%E7%90%86
+
+These baseline materials should not be presented as original work by Minxing
+Liu. The website page marks them as reference/baseline materials. Later video
+notes, rewritten explanations, and compressed exam sheets should be marked
+separately as original review work.
+
+No explicit LICENSE file was found in the referenced repository during this
+setup pass, so the original TeX source is linked rather than fully vendored in
+this public website repository.
+
+2026-06-21 update:
+
+advanced-statistical-mechanics-notes.pdf is now a merged study file:
+
+1. pages 1-54: baseline lecture-note material referring to Muatyz/review-sheet;
+2. pages 55-69: a self-written classic-problem appendix by Minxing Liu.
+
+The appendix is inspired by common problem themes in Pathria & Beale,
+Statistical Mechanics; by topic structures found in prior local
+advanced-statistical-mechanics HW4/HW5 files on this computer; and by
+non-programming Homework 2-7 plus 2025 Spring past-exam themes extracted from
+the local file "高等统计力学 讲义整理.pdf". It is written as a review index with
+problem shapes, derivation skeletons, exam cues, and key results. It does not
+copy textbook, homework, or exam problem statements verbatim.
