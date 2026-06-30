@@ -632,6 +632,35 @@ a {
   line-height: 1.75;
 }
 
+.quant-content .secure-attachment-card {
+  border-color: #bedbd5;
+}
+
+.quant-content .secure-download-button {
+  background: var(--site-accent);
+  border: 0;
+  border-radius: 6px;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+  margin: 4px 10px 4px 0;
+  padding: 9px 14px;
+}
+
+.quant-content .secure-download-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.quant-content .secure-download-status {
+  color: var(--site-muted);
+  font-size: 13px;
+}
+
+.quant-content .secure-download-status.is-error {
+  color: #b42318;
+}
+
 .quant-content .concept-table {
   border-collapse: collapse;
   margin: 12px 0 18px;
