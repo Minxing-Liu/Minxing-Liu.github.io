@@ -19,8 +19,7 @@ jobs:
         with:
           node-version: '22'
       - name: Install dependencies
-        run: |
-          if [ -f package-lock.json ]; then npm ci --ignore-scripts; else npm install --ignore-scripts; fi
+        run: npm ci --ignore-scripts
       - name: Build and check
         run: |
           npm run build
