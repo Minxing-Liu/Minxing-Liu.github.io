@@ -1,0 +1,82 @@
+\chapter{均匀物质的热力学性质}
+
+\section{Euler 关系与 Gibbs-Duhem 关系}
+
+若系统是广延的，则
+\[
+  U(\lambda S,\lambda V,\lambda N)=\lambda U(S,V,N).
+\]
+由 Euler 齐次函数定理：
+\[
+  U = TS-PV+\mu N .
+\]
+对其微分并与热力学基本方程比较：
+\[
+  \dd U=T\dd S-P\dd V+\mu\dd N ,
+\]
+得到 Gibbs-Duhem 关系
+\[
+  S\dd T - V\dd P + N\dd\mu =0 .
+\]
+这说明 $T,P,\mu$ 三个强度量并不独立。
+
+\section{Maxwell 关系}
+
+由自由能的全微分可得到 Maxwell 关系。以
+\[
+  \dd F=-S\dd T-P\dd V
+\]
+为例：
+\[
+  S=-\pdc{F}{T}{V},\qquad P=-\pdc{F}{V}{T}.
+\]
+混合偏导相等给出
+\[
+  \pdc{S}{V}{T}=\pdc{P}{T}{V}.
+\]
+
+常用四个关系：
+\[
+\begin{aligned}
+  \pdc{T}{V}{S}&=-\pdc{P}{S}{V},\\
+  \pdc{T}{P}{S}&=\pdc{V}{S}{P},\\
+  \pdc{S}{V}{T}&=\pdc{P}{T}{V},\\
+  \pdc{S}{P}{T}&=-\pdc{V}{T}{P}.
+\end{aligned}
+\]
+
+\section{热容、压缩率与膨胀系数}
+
+定义
+\[
+  C_V=T\pdc{S}{T}{V},\qquad C_P=T\pdc{S}{T}{P},
+\]
+\[
+  \alpha=\frac{1}{V}\pdc{V}{T}{P},\qquad
+  \kappa_T=-\frac{1}{V}\pdc{V}{P}{T}.
+\]
+热容差关系：
+\[
+  C_P-C_V=\frac{TV\alpha^2}{\kappa_T}.
+\]
+对理想气体有
+\[
+  C_P-C_V=Nk_{\mathrm B}=nR.
+\]
+
+\section{Joule-Thomson 过程}
+
+节流过程近似为等焓过程：
+\[
+  H=U+PV,\qquad \dd H=T\dd S+V\dd P .
+\]
+Joule-Thomson 系数定义为
+\[
+  \mu_{\rm JT}=\pdc{T}{P}{H}.
+\]
+理想气体的焓只依赖温度，所以 $\mu_{\rm JT}=0$。真实气体可出现冷却或升温，取决于吸引、排斥相互作用的竞争。
+
+\begin{keybox}
+\textbf{和高统的连接：}响应函数不是单纯的热力学技巧。统计物理中它们对应涨落，例如能量涨落对应热容，体积或粒子数涨落对应压缩率。
+\end{keybox}
+

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>热力学与统计物理基础笔记 | Minxing Liu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="热力学与统计物理基础笔记        Undergraduate Foundation     高等统计物理的前置基础     这份笔记用来补齐本科“热力学与统计物理”的主线：热力学定律、热力学势、Maxwell 关系、相变基础、不可逆过程、系综和量子统计。它服务于后续高等统计物理复习，不是课程视频逐字稿。           Draft     27p     补强版 PDF">
+<meta property="og:type" content="website">
+<meta property="og:title" content="热力学与统计物理基础笔记">
+<meta property="og:url" content="https://minxing-liu.github.io/zh/course-notes/thermal-statistical-physics/index.html">
+<meta property="og:site_name" content="Minxing Liu">
+<meta property="og:description" content="热力学与统计物理基础笔记        Undergraduate Foundation     高等统计物理的前置基础     这份笔记用来补齐本科“热力学与统计物理”的主线：热力学定律、热力学势、Maxwell 关系、相变基础、不可逆过程、系综和量子统计。它服务于后续高等统计物理复习，不是课程视频逐字稿。           Draft     27p     补强版 PDF">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-06-20T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-20T17:46:40.700Z">
+<meta property="article:author" content="Minxing Liu">
+<meta property="article:tag" content="computational neuroscience, PhD, tennis, neuroscience, research, blog">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Minxing Liu" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.1"><link rel="stylesheet" href="/css/custom.css">
+<script defer src="/js/language-switch.js"></script>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)']],
+    displayMath: [['\\[', '\\]']],
+    processEscapes: true
+  },
+  svg: {
+    fontCache: 'global'
+  }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Minxing Liu</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Computational neuroscience, olfaction, and notes from the court</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives/">Archives</a>
+        
+          <a class="main-nav-link" href="/categories/Research/">Research</a>
+        
+          <a class="main-nav-link" target="_blank" rel="noopener" href="https://ssqinlab.com/">Qin Lab</a>
+        
+          <a class="main-nav-link" target="_blank" rel="noopener" href="https://qin-group.github.io/group-wiki">Group Wiki</a>
+        
+          <a class="main-nav-link" href="/categories/Tennis/">Tennis</a>
+        
+          <a class="main-nav-link" href="/tags/similarity-matching/">Notes</a>
+        
+          <a class="main-nav-link" href="/about/">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://minxing-liu.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="page-" class="h-entry article article-type-page" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/zh/course-notes/thermal-statistical-physics/index.html" class="article-date">
+  <time class="dt-published" datetime="2026-06-20T04:00:00.000Z" itemprop="datePublished">2026-06-20</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      热力学与统计物理基础笔记
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <meta name="robots" content="noindex,nofollow,noarchive">
+
+<h1 id="热力学与统计物理基础笔记"><a href="#热力学与统计物理基础笔记" class="headerlink" title="热力学与统计物理基础笔记"></a>热力学与统计物理基础笔记</h1><div class="statmech-hero">
+  <div>
+    <p class="statmech-kicker">Undergraduate Foundation</p>
+    <h2>高等统计物理的前置基础</h2>
+    <p>这份笔记用来补齐本科“热力学与统计物理”的主线：热力学定律、热力学势、Maxwell 关系、相变基础、不可逆过程、系综和量子统计。它服务于后续高等统计物理复习，不是课程视频逐字稿。</p>
+  </div>
+  <div class="statmech-score-card">
+    <span>Draft</span>
+    <strong>27p</strong>
+    <small>补强版 PDF</small>
+  </div>
+</div>
+
+<div class="resource-grid statmech-resource-grid">
+  <a class="resource-card" href="/downloads/thermal-statistical-physics/thermal-statistical-physics-notes.pdf">
+    <span class="resource-type">PDF · 15 pages</span>
+    <strong>热力学与统计物理基础笔记</strong>
+    <small>按本科热统主线和公开讲义补强，可继续随视频追加。</small>
+  </a>
+  <a class="resource-card" href="/downloads/thermal-statistical-physics/main.tex">
+    <span class="resource-type">TeX source</span>
+    <strong>main.tex</strong>
+    <small>可编辑 LaTeX 主文件，章节内容在 contents/chapters 中。</small>
+  </a>
+  <a class="resource-card" target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1gW5u6UEML">
+    <span class="resource-type">Video outline</span>
+    <strong>热力学与统计物理-汪志诚版</strong>
+    <small>公开课程来源。当前版本参考分 P 目录和公开讲义，不是字幕转写。</small>
+  </a>
+</div>
+
+<div class="statmech-attribution">
+  <strong>来源说明：</strong>B 站公开视频 HTML 和 player API 均显示字幕列表为空；公开接口只提供了课程标题、上传账号、分 P 目录和 p=2 的章节点。因此这份 TeX/PDF 是按照课程结构、高教社公开教材目录、公开课件和通用本科热统体系重写的原创复习底稿，不是视频转录。TeX 项目结构参考 Muatyz/review-sheet 的组织方式，但未复制其完整 TeX 内容。
+</div>
+
+<h2 id="当前覆盖内容"><a href="#当前覆盖内容" class="headerlink" title="当前覆盖内容"></a>当前覆盖内容</h2><div class="statmech-roadmap">
+  <div>
+    <span>01</span>
+    <strong>热力学基本规律</strong>
+    <small>平衡态、温度、准静态过程、功、熵、自由能。</small>
+  </div>
+  <div>
+    <span>02</span>
+    <strong>均匀物质性质</strong>
+    <small>Euler 关系、Gibbs-Duhem、Maxwell 关系和响应函数。</small>
+  </div>
+  <div>
+    <span>03</span>
+    <strong>相变基础</strong>
+    <small>相平衡、Clapeyron 方程、Landau 图像。</small>
+  </div>
+  <div>
+    <span>04</span>
+    <strong>统计物理基础</strong>
+    <small>Boltzmann 熵、Gibbs 熵、微正则/正则/巨正则系综。</small>
+  </div>
+  <div>
+    <span>05</span>
+    <strong>统计分布与涨落</strong>
+    <small>不可逆过程、最概然分布、玻耳兹曼统计、玻色/费米统计、涨落-响应。</small>
+  </div>
+</div>
+
+<h2 id="实时追加区"><a href="#实时追加区" class="headerlink" title="实时追加区"></a>实时追加区</h2><ul>
+<li>2026-06-20：尝试读取 B 站字幕；公开视频 HTML 和 player API 均返回空字幕列表。随后按汪志诚教材公开目录、公开课件和本科热统主线扩展 PDF。</li>
+<li>下一步：你看视频时发具体卡点，我会把内容追加到 TeX 对应章节，并重新编译 PDF。</li>
+</ul>
+<p><a href="/zh/course-notes/advanced-statistical-mechanics/">返回高等统计物理复习工作台</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://minxing-liu.github.io/zh/course-notes/thermal-statistical-physics/index.html" data-id="cuid-pKL63teOx8jvz5VGtrjx" data-title="热力学与统计物理基础笔记" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/General/">General</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Research/">Research</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tennis/">Tennis</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/PhD-life/" rel="tag">PhD life</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computational-neuroscience/" rel="tag">computational neuroscience</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hello/" rel="tag">hello</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/introduction/" rel="tag">introduction</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mental-game/" rel="tag">mental game</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/neural-circuits/" rel="tag">neural circuits</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/neuroscience/" rel="tag">neuroscience</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/olfaction/" rel="tag">olfaction</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/productivity/" rel="tag">productivity</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/representation-learning/" rel="tag">representation learning</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/research/" rel="tag">research</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/similarity-matching/" rel="tag">similarity matching</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tennis/" rel="tag">tennis</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/PhD-life/" style="font-size: 20px;">PhD life</a> <a href="/tags/computational-neuroscience/" style="font-size: 20px;">computational neuroscience</a> <a href="/tags/hello/" style="font-size: 10px;">hello</a> <a href="/tags/introduction/" style="font-size: 10px;">introduction</a> <a href="/tags/mental-game/" style="font-size: 10px;">mental game</a> <a href="/tags/neural-circuits/" style="font-size: 10px;">neural circuits</a> <a href="/tags/neuroscience/" style="font-size: 10px;">neuroscience</a> <a href="/tags/olfaction/" style="font-size: 10px;">olfaction</a> <a href="/tags/productivity/" style="font-size: 10px;">productivity</a> <a href="/tags/representation-learning/" style="font-size: 10px;">representation learning</a> <a href="/tags/research/" style="font-size: 10px;">research</a> <a href="/tags/similarity-matching/" style="font-size: 10px;">similarity matching</a> <a href="/tags/tennis/" style="font-size: 10px;">tennis</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/06/">June 2026</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/06/">June 2024</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/03/">March 2024</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/01/">January 2024</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2026/06/09/similarity-matching-and-olfactory-preprocessing/">Similarity Matching as an Olfactory Preprocessing Network</a>
+          </li>
+        
+          <li>
+            <a href="/2024/06/15/tennis-and-science/">Tennis and Science — What the Court Has Taught Me About Research</a>
+          </li>
+        
+          <li>
+            <a href="/2024/03/10/why-i-chose-computational-neuroscience/">Why I Chose Computational Neuroscience — and What I&#39;ve Learned So Far</a>
+          </li>
+        
+          <li>
+            <a href="/2024/01/15/welcome/">Welcome to My Corner of the Web</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2026 Minxing Liu<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives/" class="mobile-nav-link">Archives</a>
+  
+    <a href="/categories/Research/" class="mobile-nav-link">Research</a>
+  
+    <a target="_blank" rel="noopener" href="https://ssqinlab.com/" class="mobile-nav-link">Qin Lab</a>
+  
+    <a target="_blank" rel="noopener" href="https://qin-group.github.io/group-wiki" class="mobile-nav-link">Group Wiki</a>
+  
+    <a href="/categories/Tennis/" class="mobile-nav-link">Tennis</a>
+  
+    <a href="/tags/similarity-matching/" class="mobile-nav-link">Notes</a>
+  
+    <a href="/about/" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

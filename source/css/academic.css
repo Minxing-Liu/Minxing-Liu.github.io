@@ -1,0 +1,6 @@
+/* Small compatibility fixes only; layout, cards and navigation come from Butterfly. */
+#article-container .katex-display { overflow-x: auto; overflow-y: hidden; padding: .4em 0; }
+#article-container .equation-block { overflow-x: auto; margin: 1.4em 0; padding: 1em; background: var(--blockquote-bg); border-left: 3px solid var(--theme-color); }
+#article-container .equation-block > div { display: flex; align-items: baseline; gap: .8em; padding: .35em 0; min-width: max-content; }
+#article-container .eq-left { min-width: 6em; font-size: .85em; }
+#article-container .table-wrap { overflow-x: auto; }

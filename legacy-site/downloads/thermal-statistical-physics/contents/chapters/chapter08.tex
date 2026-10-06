@@ -1,0 +1,138 @@
+\chapter{Bose 统计和 Fermi 统计}
+
+\section{为什么需要量子统计}
+
+当热德布罗意波长与粒子平均间距可比时，
+\[
+  n\lambda_T^3 \gtrsim 1,
+\]
+粒子波包明显重叠。此时“给粒子贴标签”的经典图像失效，必须使用全同粒子统计。
+
+全同粒子的多体波函数在交换两个粒子时只有两类可能：
+\[
+  \Psi(\ldots,i,\ldots,j,\ldots)
+  =
+  \begin{cases}
+    +\Psi(\ldots,j,\ldots,i,\ldots), & \text{Bose},\\
+    -\Psi(\ldots,j,\ldots,i,\ldots), & \text{Fermi}.
+  \end{cases}
+\]
+这两个符号最终变成平均占据数中的 $-1$ 和 $+1$。
+
+\section{Bose 与 Fermi 分布的统一形式}
+
+令
+\[
+  z=e^{\beta\mu}
+\]
+为逸度。Bose 和 Fermi 的平均占据数为
+\[
+  \bar n(\epsilon)
+  =
+  \frac{1}{z^{-1}e^{\beta\epsilon}+\eta}
+  =
+  \frac{1}{e^{\beta(\epsilon-\mu)}+\eta},
+\]
+\[
+  \eta=
+  \begin{cases}
+    -1, & \text{Bose},\\
+    +1, & \text{Fermi}.
+  \end{cases}
+\]
+Bose 分布允许低能态出现很大的占据数；Fermi 分布始终满足
+\[
+  0\le \bar n(\epsilon)\le 1.
+\]
+
+\section{Bose 气体：多粒子可以进入同一态}
+
+Bose 气体的粒子数为
+\[
+  N=\sum_l
+  \frac{\omega_l}{e^{\beta(\epsilon_l-\mu)}-1}.
+\]
+为了使分母为正，化学势必须满足
+\[
+  \mu<\epsilon_0.
+\]
+若取基态能量 $\epsilon_0=0$，则 $\mu<0$。
+
+温度降低时，激发态最多能容纳的粒子数有限。剩余粒子会集中进入基态，出现 Bose-Einstein 凝聚。三维自由 Bose 气体的凝聚条件可写成数量级关系
+\[
+  n\lambda_T^3\simeq 2.612.
+\]
+
+\begin{keybox}
+\textbf{Bose 图像：}不是因为粒子互相吸引才凝聚，而是因为全同玻色子的计数规则允许许多粒子占据同一量子态。
+\end{keybox}
+
+\section{光子气体：粒子数不守恒}
+
+光子可以被物质吸收和发射，粒子数不守恒，因此
+\[
+  \mu=0.
+\]
+光子的平均占据数为 Planck 分布
+\[
+  \bar n(\omega)
+  =
+  \frac{1}{e^{\beta\hbar\omega}-1}.
+\]
+黑体辐射能量密度满足
+\[
+  u(T)=aT^4,\qquad P=\frac{u}{3}.
+\]
+因此总能量和热容标度为
+\[
+  U\propto VT^4,\qquad C_V\propto VT^3.
+\]
+
+\section{Fermi 气体：Pauli 不相容}
+
+Fermi 分布为
+\[
+  \bar n(\epsilon)
+  =
+  \frac{1}{e^{\beta(\epsilon-\mu)}+1}.
+\]
+零温极限下，它变成阶跃函数：
+\[
+  \bar n(\epsilon)=
+  \begin{cases}
+    1, & \epsilon<\epsilon_F,\\
+    0, & \epsilon>\epsilon_F.
+  \end{cases}
+\]
+也就是说，$T=0$ 时费米子从最低能级开始逐层填满，一直填到 Fermi 能 $\epsilon_F$。
+
+三维自由电子气中
+\[
+  k_F=(3\pi^2 n)^{1/3},
+\qquad
+  \epsilon_F=\frac{\hbar^2k_F^2}{2m}.
+\]
+低温下只有 Fermi 面附近宽度约 $\kb T$ 的粒子能被热激发，所以电子热容不是经典的 $\frac{3}{2}N\kb$，而是
+\[
+  C_V\propto N\kb \frac{T}{T_F}.
+\]
+
+\section{三种统计的概念对比}
+
+\begin{center}
+\small
+\begin{tabular}{p{0.16\textwidth} p{0.34\textwidth} p{0.40\textwidth}}
+\toprule
+统计 & 计数规则 & 分布特征与典型现象 \\
+\midrule
+Boltzmann & 粒子近似可分辨，交换忽略 & $\bar n=e^{-\beta(\epsilon-\mu)}$；经典理想气体 \\
+Bose & 全同、对称、可多重占据 & 低能态占据可很大；BEC, 黑体辐射 \\
+Fermi & 全同、反对称、每态最多一个 & $0\le\bar n\le1$；Fermi 海，电子简并压 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{keybox}
+\textbf{复习顺序：}先判断粒子是否全同、是否稀薄；
+再判断粒子数是否守恒；最后选择 Boltzmann, Bose 或 Fermi 分布。
+\end{keybox}

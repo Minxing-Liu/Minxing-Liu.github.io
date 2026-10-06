@@ -1,0 +1,110 @@
+nav:
+  fixed: true
+menu:
+  首页: / || fas fa-home
+  笔记: /notes/ || fas fa-book-open
+  研究: /research/ || fas fa-flask
+  归档: /archives/ || fas fa-archive
+  关于: /about/ || fas fa-user
+social:
+  fab fa-github: https://github.com/Minxing-Liu || GitHub
+avatar:
+  img: /img/butterfly-icon.png
+  effect: false
+index_img: /images/site-banner.svg
+default_top_img: /images/site-banner.svg
+index_top_img_height: 55vh
+subtitle:
+  enable: true
+  effect: false
+  source: false
+  sub:
+  - 计算神经科学 · 数学工具 · 研究笔记
+index_layout: 3
+index_post_content:
+  method: 2
+  length: 160
+cover:
+  index_enable: true
+  aside_enable: false
+  archives_enable: false
+  default_cover:
+  - /images/site-banner.svg
+toc:
+  post: true
+  page: true
+  number: false
+  expand: false
+  scroll_percent: true
+post_copyright:
+  enable: false
+related_post:
+  enable: false
+aside:
+  enable: true
+  button: true
+  mobile: false
+  position: right
+  card_author:
+    enable: true
+    description: 上海交通大学 · 物理与天文学院<br>计算与理论神经科学
+    button:
+      enable: true
+      icon: fab fa-github
+      text: GitHub
+      link: https://github.com/Minxing-Liu
+  card_announcement:
+    enable: false
+  card_recent_post:
+    enable: true
+    limit: 4
+  card_categories:
+    enable: true
+  card_tags:
+    enable: false
+  card_archives:
+    enable: false
+  card_webinfo:
+    enable: false
+math:
+  use: katex
+  per_page: true
+  hide_scrollbar: false
+  katex:
+    copy_tex: true
+search:
+  use: local_search
+  placeholder: 搜索笔记与公式关键词
+  local_search:
+    preload: false
+    top_n_per_article: 2
+darkmode:
+  enable: true
+  button: true
+  autoChangeMode: false
+readmode: true
+share:
+  use: null
+comments:
+  use: null
+busuanzi:
+  site_uv: false
+  site_pv: false
+  page_pv: false
+footer:
+  owner:
+    enable: true
+    since: 2026
+  copyright:
+    enable: true
+    version: true
+CDN:
+  internal_provider: local
+  third_party_provider: jsdelivr
+  version: true
+  option:
+    katex: /vendor/katex/katex.min.css
+    katex_copytex: /vendor/katex/copy-tex.min.js
+inject:
+  head:
+  - <link rel="stylesheet" href="/css/academic.css">

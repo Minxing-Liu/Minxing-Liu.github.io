@@ -1,0 +1,135 @@
+\chapter{Boltzmann 统计}
+
+\section{Boltzmann 统计在讲什么}
+
+Boltzmann 统计描述的是\textbf{经典稀薄气体}。它的核心近似是：虽然真实粒子可能是全同粒子，但每个单粒子态的平均占据很小，交换效应可以忽略。
+\[
+  \bar n_l\ll 1,\qquad n\lambda_T^3\ll 1.
+\]
+因此第 7 章可以理解为：把第 6 章的 Boltzmann 分布真正用于计算理想气体的 $Z,F,P,S,\mu,C_V$。
+
+\begin{keybox}
+\textbf{适用条件：}高温、低密度、大质量时，热德布罗意波长 $\lambda_T$ 小，波包重叠少，量子统计退化为经典 Boltzmann 统计。
+\end{keybox}
+
+\section{单粒子配分函数}
+
+经典理想气体的单粒子配分函数是
+\[
+  z_1
+  =\frac{1}{h^3}\int e^{-\beta p^2/2m}\dd^3p
+  \int\dd^3q.
+\]
+动量积分给出热波长，位置积分给出体积：
+\[
+  z_1=\frac{V}{\lambda_T^3},
+\qquad
+  \lambda_T=\frac{h}{\sqrt{2\pi m\kb T}}.
+\]
+
+$z_1$ 的物理意义是：一个粒子在温度 $T$ 下可访问的有效单粒子状态数。$V$ 越大状态越多；温度越高，$\lambda_T$ 越小，状态数也越多。
+
+\section{Gibbs 修正和 N 粒子配分函数}
+
+若直接写 $z_1^N$，会把全同粒子交换造成的同一个物理状态重复计算 $N!$ 次。因此经典全同粒子的正则配分函数是
+\[
+  Z_N=\frac{z_1^N}{N!}
+  =\frac{1}{N!}
+  \left(\frac{V}{\lambda_T^3}\right)^N.
+\]
+这个 $N!$ 称为 Gibbs 修正。没有它，熵会出现 Gibbs 佯谬，不能正确满足广延性。
+
+\section{由配分函数得到热力学量}
+
+正则系综中
+\[
+  F=-\kb T\ln Z_N.
+\]
+对理想气体，用 Stirling 公式 $\ln N!\simeq N\ln N-N$ 得
+\[
+  F=-N\kb T
+  \left[
+    \ln\left(\frac{V}{N\lambda_T^3}\right)+1
+  \right].
+\]
+热力学量由 $F$ 生成：
+\[
+  P=-\pdc{F}{V}{T,N},\qquad
+  S=-\pdc{F}{T}{V,N},\qquad
+  \mu=\pdc{F}{N}{T,V}.
+\]
+结果为
+\[
+  PV=N\kb T,
+\]
+\[
+  \mu=-\kb T\ln\left(\frac{V}{N\lambda_T^3}\right),
+\]
+\[
+  S=N\kb
+  \left[
+    \ln\left(\frac{V}{N\lambda_T^3}\right)+\frac{5}{2}
+  \right].
+\]
+
+\begin{keybox}
+\textbf{计算路线：}$z_1\to Z_N\to F\to P,S,\mu$。第 7 章大部分题目都沿这条线走。
+\end{keybox}
+
+\section{能均分定理}
+
+若哈密顿量中某个广义坐标或动量以平方项出现：
+\[
+  H=\cdots + a x^2+\cdots,
+\]
+则平衡平均能量中该二次项贡献
+\[
+  \avg{a x^2}=\frac{1}{2}\kb T.
+\]
+单原子理想气体只有三个平动动能二次项，所以
+\[
+  U=\frac{3}{2}N\kb T,\qquad
+  C_V=\frac{3}{2}N\kb.
+\]
+由 $H=U+PV$ 得
+\[
+  C_P=C_V+N\kb=\frac{5}{2}N\kb.
+\]
+
+\section{Maxwell 速度分布}
+
+Boltzmann 因子给出单粒子的速度分布：
+\[
+  f(\bm v)
+  =
+  \left(\frac{m}{2\pi\kb T}\right)^{3/2}
+  \exp\left(-\frac{mv^2}{2\kb T}\right).
+\]
+速率分布多一个球壳因子 $4\pi v^2$：
+\[
+  g(v)=4\pi v^2
+  \left(\frac{m}{2\pi\kb T}\right)^{3/2}
+  \exp\left(-\frac{mv^2}{2\kb T}\right).
+\]
+常见三个速率：
+\[
+  v_{\rm mp}=\sqrt{\frac{2\kb T}{m}},\qquad
+  \bar v=\sqrt{\frac{8\kb T}{\pi m}},\qquad
+  v_{\rm rms}=\sqrt{\frac{3\kb T}{m}}.
+\]
+
+\section{Boltzmann 统计和第 6 章的关系}
+
+第 6 章给出最概然占据数
+\[
+  a_l=\omega_l e^{-\alpha-\beta\epsilon_l}.
+\]
+第 7 章换一种更方便的语言，用配分函数归一化概率：
+\[
+  p_l=\frac{e^{-\beta\epsilon_l}}{z_1}.
+\]
+两者描述的是同一件事：在经典稀薄极限下，高能态概率按 $e^{-\beta\epsilon}$ 指数衰减。
+
+\begin{keybox}
+\textbf{容易混淆处：}Boltzmann 统计不是“所有经典问题”的代名词，而是“单态占据很小、交换效应可忽略”的统计近似。密度足够高或温度足够低时，即使无相互作用也必须改用 Bose 或 Fermi 统计。
+\end{keybox}

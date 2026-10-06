@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Fluid Dynamics | Minxing Liu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Fluid DynamicsInstructor: Zhang Hepeng中文版：流体动力学Back to: Soft Matter Physics Course Notes Core PictureSoft matter usually moves in water, oil, or complex fluids. At micron scales, inertia is often we">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Fluid Dynamics">
+<meta property="og:url" content="https://minxing-liu.github.io/notes/soft-matter-core-notes/fluid-dynamics/index.html">
+<meta property="og:site_name" content="Minxing Liu">
+<meta property="og:description" content="Fluid DynamicsInstructor: Zhang Hepeng中文版：流体动力学Back to: Soft Matter Physics Course Notes Core PictureSoft matter usually moves in water, oil, or complex fluids. At micron scales, inertia is often we">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-06-19T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-19T04:11:59.918Z">
+<meta property="article:author" content="Minxing Liu">
+<meta property="article:tag" content="computational neuroscience, PhD, tennis, neuroscience, research, blog">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Minxing Liu" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.1"><link rel="stylesheet" href="/css/custom.css">
+<script defer src="/js/language-switch.js"></script>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)']],
+    displayMath: [['\\[', '\\]']],
+    processEscapes: true
+  },
+  svg: {
+    fontCache: 'global'
+  }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Minxing Liu</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">Computational neuroscience, olfaction, and notes from the court</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives/">Archives</a>
+        
+          <a class="main-nav-link" href="/categories/Research/">Research</a>
+        
+          <a class="main-nav-link" target="_blank" rel="noopener" href="https://ssqinlab.com/">Qin Lab</a>
+        
+          <a class="main-nav-link" target="_blank" rel="noopener" href="https://qin-group.github.io/group-wiki">Group Wiki</a>
+        
+          <a class="main-nav-link" href="/categories/Tennis/">Tennis</a>
+        
+          <a class="main-nav-link" href="/tags/similarity-matching/">Notes</a>
+        
+          <a class="main-nav-link" href="/about/">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://minxing-liu.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="page-" class="h-entry article article-type-page" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/notes/soft-matter-core-notes/fluid-dynamics/index.html" class="article-date">
+  <time class="dt-published" datetime="2026-06-19T04:00:00.000Z" itemprop="datePublished">2026-06-19</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      Fluid Dynamics
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <meta name="robots" content="noindex,nofollow,noarchive">
+
+<h1 id="Fluid-Dynamics"><a href="#Fluid-Dynamics" class="headerlink" title="Fluid Dynamics"></a>Fluid Dynamics</h1><p>Instructor: Zhang Hepeng<br>中文版：<a href="/zh/course-notes/soft-matter-core-notes/fluid-dynamics/">流体动力学</a><br>Back to: <a href="/notes/soft-matter-core-notes/">Soft Matter Physics Course Notes</a></p>
+<h2 id="Core-Picture"><a href="#Core-Picture" class="headerlink" title="Core Picture"></a>Core Picture</h2><p>Soft matter usually moves in water, oil, or complex fluids. At micron scales, inertia is often weak and viscosity dominates. When force is removed, motion stops almost immediately.</p>
+<h2 id="Continuum-Description"><a href="#Continuum-Description" class="headerlink" title="Continuum Description"></a>Continuum Description</h2><p>Fluid dynamics describes a fluid with velocity field v(r,t), pressure p(r,t), and density rho.</p>
+<div class="equation-block">
+  <div><span class="eq-left">material D</span><span class="eq-op">=</span><span>\(\frac{D}{Dt}=\partial_t+\mathbf v\cdot\nabla\)</span></div>
+  <div><span class="eq-left">continuity</span><span class="eq-op">=</span><span>\(\partial_t\rho+\nabla\cdot(\rho\mathbf v)=0\)</span></div>
+  <div><span class="eq-left">incompressible</span><span class="eq-op">=</span><span>\(\nabla\cdot\mathbf v=0\)</span></div>
+</div>
+
+<p>The material derivative follows a moving fluid element. Incompressibility is a good approximation for water and many soft-matter experiments.</p>
+<h2 id="Viscosity-and-Newtonian-Fluid"><a href="#Viscosity-and-Newtonian-Fluid" class="headerlink" title="Viscosity and Newtonian Fluid"></a>Viscosity and Newtonian Fluid</h2><p>For a Newtonian fluid, shear stress is proportional to shear rate.</p>
+<div class="equation-block">
+  <div><span class="eq-left">shear</span><span class="eq-op">=</span><span>\(\tau=\eta\dot\gamma\)</span></div>
+  <div><span class="eq-left">stress</span><span class="eq-op">=</span><span>\(\sigma_{ij}=-p\delta_{ij}+\eta(\partial_i v_j+\partial_j v_i)\)</span></div>
+  <div><span class="eq-left">viscosity</span><span class="eq-op">=</span><span>\(\eta\) measures momentum diffusion</span></div>
+</div>
+
+<h2 id="Navier-Stokes-and-Low-Re-Limit"><a href="#Navier-Stokes-and-Low-Re-Limit" class="headerlink" title="Navier-Stokes and Low-Re Limit"></a>Navier-Stokes and Low-Re Limit</h2><p>Navier-Stokes is momentum conservation. In soft matter, the low-Reynolds-number limit often applies, giving the Stokes equation.</p>
+<div class="equation-block">
+  <div><span class="eq-left">NS</span><span class="eq-op">=</span><span>\(\rho\frac{D\mathbf v}{Dt}=-\nabla p+\eta\nabla^2\mathbf v+\mathbf f\)</span></div>
+  <div><span class="eq-left">Re</span><span class="eq-op">=</span><span>\(\rho U L/\eta\)</span></div>
+  <div><span class="eq-left">Stokes</span><span class="eq-op">=</span><span>\(0=-\nabla p+\eta\nabla^2\mathbf v+\mathbf f\)</span></div>
+  <div><span class="eq-left">constraint</span><span class="eq-op">=</span><span>\(\nabla\cdot\mathbf v=0\)</span></div>
+</div>
+
+<p>Small Re means viscous forces dominate and inertial memory is negligible. This is the basis of microfluidics, colloidal hydrodynamics, and cellular-scale motion.</p>
+<h2 id="Drag-on-a-Sphere"><a href="#Drag-on-a-Sphere" class="headerlink" title="Drag on a Sphere"></a>Drag on a Sphere</h2><p>A sphere of radius R moving with speed U through a viscous fluid experiences Stokes drag.</p>
+<div class="equation-block">
+  <div><span class="eq-left">drag</span><span class="eq-op">=</span><span>\(F=6\pi\eta R U\)</span></div>
+  <div><span class="eq-left">mobility</span><span class="eq-op">=</span><span>\(U=\mu F\)</span></div>
+  <div><span class="eq-left">mu</span><span class="eq-op">=</span><span>\(\mu=\frac{1}{6\pi\eta R}\)</span></div>
+</div>
+
+<p>This formula connects directly to the Stokes-Einstein relation in Brownian motion.</p>
+<h2 id="Poiseuille-Flow"><a href="#Poiseuille-Flow" class="headerlink" title="Poiseuille Flow"></a>Poiseuille Flow</h2><p>Flow through a narrow tube is extremely sensitive to tube radius.</p>
+<div class="equation-block">
+  <div><span class="eq-left">Poiseuille</span><span class="eq-op">=</span><span>\(Q=\frac{\pi a^4\Delta p}{8\eta L}\)</span></div>
+  <div><span class="eq-left">resistance</span><span class="eq-op">=</span><span>\(\frac{\Delta p}{Q}=\frac{8\eta L}{\pi a^4}\)</span></div>
+</div>
+
+<h2 id="Exam-Cue"><a href="#Exam-Cue" class="headerlink" title="Exam Cue"></a>Exam Cue</h2><p>For micron-scale motion in water, estimate Re first. If Re is small, use Stokes equation, Stokes drag, mobility, and then connect to Stokes-Einstein diffusion when thermal noise is included.</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://minxing-liu.github.io/notes/soft-matter-core-notes/fluid-dynamics/index.html" data-id="cuidq31b7ZWkG9pMotumPSdVK" data-title="Fluid Dynamics" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/General/">General</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Research/">Research</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Tennis/">Tennis</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/PhD-life/" rel="tag">PhD life</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/computational-neuroscience/" rel="tag">computational neuroscience</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hello/" rel="tag">hello</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/introduction/" rel="tag">introduction</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mental-game/" rel="tag">mental game</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/neural-circuits/" rel="tag">neural circuits</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/neuroscience/" rel="tag">neuroscience</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/olfaction/" rel="tag">olfaction</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/productivity/" rel="tag">productivity</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/representation-learning/" rel="tag">representation learning</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/research/" rel="tag">research</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/similarity-matching/" rel="tag">similarity matching</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tennis/" rel="tag">tennis</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/PhD-life/" style="font-size: 20px;">PhD life</a> <a href="/tags/computational-neuroscience/" style="font-size: 20px;">computational neuroscience</a> <a href="/tags/hello/" style="font-size: 10px;">hello</a> <a href="/tags/introduction/" style="font-size: 10px;">introduction</a> <a href="/tags/mental-game/" style="font-size: 10px;">mental game</a> <a href="/tags/neural-circuits/" style="font-size: 10px;">neural circuits</a> <a href="/tags/neuroscience/" style="font-size: 10px;">neuroscience</a> <a href="/tags/olfaction/" style="font-size: 10px;">olfaction</a> <a href="/tags/productivity/" style="font-size: 10px;">productivity</a> <a href="/tags/representation-learning/" style="font-size: 10px;">representation learning</a> <a href="/tags/research/" style="font-size: 10px;">research</a> <a href="/tags/similarity-matching/" style="font-size: 10px;">similarity matching</a> <a href="/tags/tennis/" style="font-size: 10px;">tennis</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/06/">June 2026</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/06/">June 2024</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/03/">March 2024</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/01/">January 2024</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2026/06/09/similarity-matching-and-olfactory-preprocessing/">Similarity Matching as an Olfactory Preprocessing Network</a>
+          </li>
+        
+          <li>
+            <a href="/2024/06/15/tennis-and-science/">Tennis and Science — What the Court Has Taught Me About Research</a>
+          </li>
+        
+          <li>
+            <a href="/2024/03/10/why-i-chose-computational-neuroscience/">Why I Chose Computational Neuroscience — and What I&#39;ve Learned So Far</a>
+          </li>
+        
+          <li>
+            <a href="/2024/01/15/welcome/">Welcome to My Corner of the Web</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2026 Minxing Liu<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives/" class="mobile-nav-link">Archives</a>
+  
+    <a href="/categories/Research/" class="mobile-nav-link">Research</a>
+  
+    <a target="_blank" rel="noopener" href="https://ssqinlab.com/" class="mobile-nav-link">Qin Lab</a>
+  
+    <a target="_blank" rel="noopener" href="https://qin-group.github.io/group-wiki" class="mobile-nav-link">Group Wiki</a>
+  
+    <a href="/categories/Tennis/" class="mobile-nav-link">Tennis</a>
+  
+    <a href="/tags/similarity-matching/" class="mobile-nav-link">Notes</a>
+  
+    <a href="/about/" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

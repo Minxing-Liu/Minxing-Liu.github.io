@@ -1,0 +1,315 @@
+\chapter{系综理论}
+
+\section{系综到底是什么}
+
+真实世界中通常只有一个系统，例如一个盒子里的气体。但统计物理无法逐个追踪 $10^{23}$ 个粒子的运动，所以 Gibbs 引入了\textbf{系综}的思想：假想有无数个满足相同宏观条件的虚拟副本。它们的宏观条件相同，但微观状态不同。
+
+因此，系综不是一个真实容器，而是一种计算概率平均的方法。若微观态 $i$ 的概率为 $p_i$，宏观量 $A$ 的统计平均为
+\[
+  \avg{A}=\sum_i p_i A_i.
+\]
+经典相空间中也可写为
+\[
+  \avg{A}=\int \rho(q,p)A(q,p)\dd\Gamma.
+\]
+
+系综和统计的区别：
+\begin{itemize}
+  \item \textbf{统计}决定微观态如何计数：Boltzmann, Bose, Fermi。
+  \item \textbf{系综}决定概率分布由哪些外界约束给出：$E$ 固定、$T$ 固定、还是 $\mu$ 固定。
+\end{itemize}
+
+\section{三个常用系综的总表}
+
+\begin{center}
+\small
+\begin{tabular}{p{0.16\textwidth} p{0.18\textwidth} p{0.27\textwidth} p{0.27\textwidth}}
+\toprule
+系综 & 固定量 & 概率 & 热力学势 \\
+\midrule
+微正则 & $E,V,N$ & $p_i=1/\Omega$ & $S=\kb\ln\Omega$ \\
+正则 & $T,V,N$ & $p_i=e^{-\beta E_i}/Z$ & $F=-\kb T\ln Z$ \\
+巨正则 & $T,V,\mu$ & $p_{i,N}=e^{-\beta(E_{i,N}-\mu N)}/\Xi$ & $\Phi=-\kb T\ln\Xi=-PV$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{keybox}
+\textbf{选择规则：}孤立系统用微正则；接触热库用正则；既能交换能量又能交换粒子用巨正则。
+\end{keybox}
+
+\section{和前面分布的关系}
+
+第 6 章已经讲了 Boltzmann, Bose, Fermi 三种统计分布。本章的系综不是另一个无关主题，而是在回答更高一层的问题：
+\[
+  \text{外界固定什么量？系统允许什么量涨落？}
+\]
+
+整个课程主线可以按下面理解：
+\[
+\begin{aligned}
+  \Omega(E,V,N)
+  &\longrightarrow
+  S=\kb\ln\Omega
+  &&\text{微正则：固定 }E,V,N,\\
+  Z(T,V,N)
+  &\longrightarrow
+  F=-\kb T\ln Z
+  &&\text{正则：固定 }T,V,N,\\
+  \Xi(T,V,\mu)
+  &\longrightarrow
+  \bar n_i
+  &&\text{巨正则：固定 }T,V,\mu.
+\end{aligned}
+\]
+
+三种统计的平均占据数最自然地由巨正则系综推出。对单粒子态 $i$，
+\[
+  \bar n_i
+  =
+  \frac{1}{e^{\beta(\epsilon_i-\mu)}+\eta},
+\qquad
+  \eta=
+  \begin{cases}
+    -1, & \text{Bose},\\
+    +1, & \text{Fermi},\\
+    0, & \text{Boltzmann}.
+  \end{cases}
+\]
+也就是
+\[
+  \bar n_i^{\rm BE}
+  =
+  \frac{1}{e^{\beta(\epsilon_i-\mu)}-1},
+\qquad
+  \bar n_i^{\rm FD}
+  =
+  \frac{1}{e^{\beta(\epsilon_i-\mu)}+1},
+\qquad
+  \bar n_i^{\rm MB}
+  =
+  e^{-\beta(\epsilon_i-\mu)}.
+\]
+
+\begin{keybox}
+\textbf{逻辑关系：}统计解决“怎么数微观态”；系综解决“哪些宏观量固定、哪些量涨落”。第 6 章从计数推分布，本章从概率权重和配分函数统一这些分布。
+\end{keybox}
+
+\section{微正则系综：孤立系统}
+
+微正则系综固定
+\[
+  E,V,N.
+\]
+所有满足这些宏观约束的微观态等概率：
+\[
+  p_i=\frac{1}{\Omega(E,V,N)}.
+\]
+熵定义为
+\[
+  S=\kb\ln\Omega.
+\]
+做题路线是
+\[
+  \Omega(E,V,N)
+  \longrightarrow
+  S(E,V,N)
+  \longrightarrow
+  T,P,\mu.
+\]
+热力学量由熵的偏导给出：
+\[
+  \frac{1}{T}=\pdc{S}{E}{V,N},
+\qquad
+  \frac{P}{T}=\pdc{S}{V}{E,N},
+\qquad
+  -\frac{\mu}{T}=\pdc{S}{N}{E,V}.
+\]
+
+\section{正则系综：接触热库}
+
+正则系综固定
+\[
+  T,V,N.
+\]
+系统能和热库交换能量，所以系统能量 $E_i$ 可以涨落。概率为
+\[
+  p_i=\frac{e^{-\beta E_i}}{Z},
+\qquad
+  Z=\sum_i e^{-\beta E_i}.
+\]
+配分函数 $Z$ 是所有 Boltzmann 权重的归一化和。下面推导三个最常用公式。
+
+内能定义为平均能量：
+\[
+  U=\avg{E}
+  =
+  \sum_i E_i p_i
+  =
+  \frac{1}{Z}\sum_i E_i e^{-\beta E_i}.
+\]
+又因为
+\[
+  \frac{\partial Z}{\partial\beta}
+  =
+  \sum_i \frac{\partial}{\partial\beta}e^{-\beta E_i}
+  =
+  -\sum_i E_i e^{-\beta E_i},
+\]
+所以
+\[
+  U=-\frac{\partial}{\partial\beta}\ln Z.
+\]
+
+将正则分布代入 Gibbs 熵
+\[
+  S=-\kb\sum_i p_i\ln p_i.
+\]
+因为
+\[
+  \ln p_i=-\beta E_i-\ln Z,
+\]
+所以
+\[
+  S
+  =
+  -\kb\sum_i p_i(-\beta E_i-\ln Z)
+  =
+  \kb\beta U+\kb\ln Z
+  =
+  \frac{U}{T}+\kb\ln Z.
+\]
+代入 $F=U-TS$，得到
+\[
+  F=-\kb T\ln Z.
+\]
+
+热力学基本关系
+\[
+  \dd F=-S\dd T-P\dd V+\mu\dd N
+\]
+给出
+\[
+  S=-\pdc{F}{T}{V,N}.
+\]
+压强可由
+\[
+  P=\kb T\pdc{\ln Z}{V}{T,N}.
+\]
+
+正则系综中能量涨落满足
+\[
+  \avg{(\Delta E)^2}
+  =
+  \kb T^2 C_V.
+\]
+宏观系统中相对涨落通常随 $N^{-1/2}$ 变小。
+
+\section{巨正则系综：接触热库和粒子库}
+
+巨正则系综固定
+\[
+  T,V,\mu.
+\]
+系统既能交换能量，也能交换粒子，所以 $E$ 和 $N$ 都可以涨落。概率为
+\[
+  p_{i,N}
+  =
+  \frac{e^{-\beta(E_{i,N}-\mu N)}}{\Xi}.
+\]
+巨配分函数为
+\[
+  \Xi=\sum_N\sum_i e^{-\beta(E_{i,N}-\mu N)}.
+\]
+巨势为
+\[
+  \Phi=-\kb T\ln\Xi=-PV.
+\]
+平均粒子数为
+\[
+  \avg{N}
+  =
+  \frac{1}{\beta}
+  \pdc{\ln\Xi}{\mu}{T,V}.
+\]
+
+巨正则系综尤其适合推导量子气体分布，因为每个单粒子态都可以看作一个能和粒子库交换粒子的“小系统”。这就是 Bose/Fermi 分布常用巨正则推导的原因。
+
+\subsection*{从巨正则到平均占据数}
+
+对一个单粒子态 $i$，能量为 $\epsilon_i$。若该态中有 $n_i$ 个粒子，则
+\[
+  E_i=n_i\epsilon_i,\qquad N_i=n_i.
+\]
+Bose 态允许
+\[
+  n_i=0,1,2,\cdots,
+\]
+单态巨配分函数为
+\[
+  \Xi_i^{\rm BE}
+  =
+  \sum_{n_i=0}^{\infty}e^{-\beta n_i(\epsilon_i-\mu)}
+  =
+  \frac{1}{1-e^{-\beta(\epsilon_i-\mu)}}.
+\]
+于是
+\[
+  \bar n_i^{\rm BE}
+  =
+  \frac{1}{e^{\beta(\epsilon_i-\mu)}-1}.
+\]
+
+Fermi 态只允许
+\[
+  n_i=0,1,
+\]
+所以
+\[
+  \Xi_i^{\rm FD}
+  =
+  1+e^{-\beta(\epsilon_i-\mu)},
+\qquad
+  \bar n_i^{\rm FD}
+  =
+  \frac{1}{e^{\beta(\epsilon_i-\mu)}+1}.
+\]
+当 $\bar n_i\ll 1$ 时，分母中的 $\pm 1$ 可忽略，二者都退化为 Boltzmann 分布
+\[
+  \bar n_i^{\rm MB}=e^{-\beta(\epsilon_i-\mu)}.
+\]
+
+\section{系综等价和不等价}
+
+在热力学极限
+\[
+  N,V\to\infty,\qquad \frac{N}{V}=\text{constant},
+\]
+不同系综给出的强度量通常相同。原因是相对涨落随系统大小变小，例如
+\[
+  \frac{\sqrt{\avg{(\Delta E)^2}}}{U}
+  \sim
+  \frac{1}{\sqrt{N}}.
+\]
+但有限系统、长程相互作用系统或相变临界附近，系综差异可能更明显。
+
+\section{统计和系综如何组合}
+
+实际做题时需要同时选择“统计”和“系综”：
+\begin{center}
+\small
+\begin{tabular}{p{0.24\textwidth} p{0.32\textwidth} p{0.33\textwidth}}
+\toprule
+问题类型 & 统计选择 & 系综选择 \\
+\midrule
+经典理想气体 & Boltzmann & 常用正则系综 $Z_N$ \\
+光子气体 & Bose, 且 $\mu=0$ & 常用巨正则思想 \\
+电子气 & Fermi & 常用巨正则或固定 $N$ 低温展开 \\
+孤立系统状态数 & 取决于粒子类型 & 微正则系综 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{keybox}
+\textbf{一页记忆：}统计解决“怎么数微观态”，系综解决“哪些宏观量固定”。二者是两条不同轴线，可以组合使用。
+\end{keybox}

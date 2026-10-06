@@ -1,0 +1,67 @@
+\chapter{统计物理的基本原理}
+
+\section{Boltzmann 熵}
+
+统计物理把宏观状态对应到大量微观状态。孤立系统中，若宏观约束下可访问微观态数为 $\micro$，Boltzmann 熵定义为
+\[
+  S=\kb\ln \micro .
+\]
+热力学平衡对应 $\micro$ 最大，或者等价地，熵最大。
+
+\section{Gibbs 熵}
+
+若系统处于微观态 $i$ 的概率为 $p_i$，则
+\[
+  S=-\kb\sum_i p_i\ln p_i .
+\]
+在归一化约束 $\sum_i p_i=1$ 下，等概率分布使熵最大。若再固定平均能量
+\[
+  \sum_i p_iE_i=U,
+\]
+用拉格朗日乘子法可得正则分布
+\[
+  p_i=\frac{e^{-\beta E_i}}{Z},\qquad
+  Z=\sum_i e^{-\beta E_i},\qquad
+  \beta=\frac{1}{\kb T}.
+\]
+
+\section{微正则、正则与巨正则系综}
+
+\subsection*{微正则系综}
+
+孤立系统，固定 $E,V,N$。基本假设是等概率：
+\[
+  p_i=\frac{1}{\micro(E,V,N)}.
+\]
+
+\subsection*{正则系综}
+
+系统与热库接触，固定 $T,V,N$。配分函数
+\[
+  Z(T,V,N)=\sum_i e^{-\beta E_i}.
+\]
+Helmholtz 自由能由
+\[
+  F=-\kb T\ln Z
+\]
+给出。平均能量与能量涨落：
+\[
+  U=-\frac{\partial}{\partial\beta}\ln Z,\qquad
+  \avg{(\Delta E)^2}=\frac{\partial^2}{\partial\beta^2}\ln Z=\kb T^2C_V.
+\]
+
+\subsection*{巨正则系综}
+
+系统与热库、粒子库接触，固定 $T,V,\mu$。巨配分函数
+\[
+  \Xi=\sum_N\sum_i e^{-\beta(E_{i,N}-\mu N)}.
+\]
+巨势
+\[
+  \Phi=-\kb T\ln\Xi=-PV.
+\]
+
+\begin{keybox}
+\textbf{和高等统计物理的连接：}本科热统先建立三个系综和配分函数；高统会进一步关心关联函数、涨落响应、临界行为和场论化描述。
+\end{keybox}
+
