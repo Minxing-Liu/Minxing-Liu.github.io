@@ -7,6 +7,14 @@ const required = ['index.html', 'notes/index.html', 'about/index.html', 'researc
 for (const name of required) if (!fs.existsSync(path.join(output, name))) errors.push('缺少文件：' + name);
 const visit = dir => fs.readdirSync(dir, {withFileTypes: true}).flatMap(e => e.isDirectory() ? visit(path.join(dir, e.name)) : [path.join(dir, e.name)]);
 if (!errors.length) {
+  const search = cheerio.load(fs.readFileSync('public/search.xml', 'utf8'), {xmlMode: true});
+  search('entry > url').each(function() {
+    const url = search(this).text();
+    if (!url.startsWith('/') || url.startsWith('//')) { errors.push('搜索结果未指向站内：' + url); return; }
+    let rel = decodeURIComponent(url).replace(/^\//, '');
+    if (rel.endsWith('/')) rel += 'index.html';
+    if (!fs.existsSync(path.join(output, rel))) errors.push('搜索结果目标缺失：' + url);
+  });
   const home = fs.readFileSync('public/index.html', 'utf8');
   if (!home.includes('Butterfly')) errors.push('首页没有 Butterfly 主题标识');
   const pca = fs.readFileSync('public/notes/covariance-correlation-pca/index.html', 'utf8');
@@ -43,4 +51,4 @@ if (fs.existsSync('legacy-site')) {
   }
 }
 if (errors.length) { console.error(errors.join('\n')); process.exit(1); }
-console.log('检查通过：Butterfly 首页、PCA 公式、文章链接、旧 URL 和受保护附件。');
+console.log('检查通过：Butterfly 首页、PCA 公式、文章链接、搜索结果、旧 URL 和受保护附件。');

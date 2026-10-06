@@ -61,3 +61,14 @@ hexo.extend.filter.register('after_generate', function() {
   });
   register('vendor/katex/copy-tex.min.js', path.join(dist, 'contrib/copy-tex.min.js'));
 });
+
+// Hexo 8 custom permalinks may already start with '/', while searchdb prefixes config.root.
+// Keep search results on this site rather than turning '//notes/...' into an external hostname.
+hexo.extend.filter.register('after_generate', async function() {
+  const route = hexo.config.search.path;
+  const stream = hexo.route.get(route);
+  if (!stream) return;
+  let xml = '';
+  for await (const chunk of stream) xml += chunk.toString();
+  hexo.route.set(route, xml.replace(/<url>\/{2,}/g, '<url>/'));
+}, 20);
