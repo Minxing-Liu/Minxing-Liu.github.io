@@ -9,6 +9,8 @@
 | 想修改的内容 | 配置项 |
 | --- | --- |
 | 顶部导航及下拉链接 | `menu` |
+| 浏览器标签页图标 | `favicon` |
+| 侧栏及移动端头像 | `avatar.img` |
 | 首页背景图 | `index_img` |
 | 其他页面的默认背景 | `default_top_img` |
 | 首页打字字幕 | `subtitle.sub`，每一行是轮播的一句话 |
@@ -18,6 +20,8 @@
 | 页脚导航 | `footer.nav` |
 
 站名和作者仍在 `_config.yml`。新增文章时，可以在开头的配置区写 `cover: /images/你的图片.jpg`，替换该文章的默认封面。
+
+目前 `favicon` 和 `avatar.img` 都使用用户提供的原始头像 `/images/minxing-avatar.jpg`。更换图标时建议同时换文件名和配置路径，避免浏览器继续使用旧图标缓存。
 
 `index_top_img_height` 和 `index_site_info_top` 留空，沿用主题的全屏首屏和居中标题。副标题使用主题原生 Typed.js，循环播放本地配置的三句话；`source: false` 表示不依赖随机句子接口。
 

@@ -89,7 +89,9 @@ Butterfly 已正式上线。`main` 保存日常维护的源码，`.github/workfl
 | docs/migration.md | 来源及迁移范围 |
 | .github/workflows/site.yml | 自动构建与发布 |
 
-模板样式来自 Butterfly，未重写页面布局。首页使用官网同款全屏背景、导航下拉菜单和循环打字副标题；文章、作者和菜单目标换成本站内容。头像暂用主题默认头像。修改背景、字幕、菜单等，见 [外观配置](docs/appearance.md)。
+模板样式来自 Butterfly，未重写页面布局。首页使用官网同款全屏背景、导航下拉菜单和循环打字副标题；文章、作者和菜单目标换成本站内容。页面头像和浏览器标签图标使用 `source/images/minxing-avatar.jpg`。修改背景、字幕、菜单等，见 [外观配置](docs/appearance.md)。
+
+如果习惯先在飞书写笔记，见 [飞书笔记发布流程](docs/feishu-notes.md)。
 
 - [Butterfly 官方文档](https://butterfly.js.org/posts/21cfbf15/)
 - [官方主题仓库](https://github.com/jerryc127/hexo-theme-butterfly)

@@ -23,8 +23,9 @@ menu:
     中文: / || fas fa-c
 social:
   fab fa-github: https://github.com/Minxing-Liu || GitHub
+favicon: /images/minxing-avatar.jpg
 avatar:
-  img: /img/butterfly-icon.png
+  img: /images/minxing-avatar.jpg
   effect: false
 # 官网同款封面；本地保存背景，避免首屏依赖外部图床。
 index_img: /images/butterfly-hero.jpg
