@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "飞书 → Minxing 的学术网站",
+  "version": "1.0.0",
+  "description": "在飞书文档页面一键发布或更新自己的 Hexo 笔记。",
+  "minimum_chrome_version": "114",
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": ["https://api.github.com/*"],
+  "action": {"default_popup": "popup.html", "default_title": "发布到学术网站"},
+  "options_page": "options.html",
+  "background": {"service_worker": "background.mjs", "type": "module"}
+}

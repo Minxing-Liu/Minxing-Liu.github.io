@@ -1,0 +1,83 @@
+name: Publish Feishu note
+run-name: Feishu publish ${{ inputs.request_id || github.run_id }}
+on:
+  workflow_dispatch:
+    inputs:
+      document_url:
+        description: 飞书 docx 或 wiki 文档链接（发布内容将公开）
+        required: true
+        type: string
+      slug:
+        description: 首次发布可填英文网址简称；更新时留空
+        type: string
+      category:
+        description: 分类；首次留空为数学工具，更新留空沿用
+        type: string
+      request_id:
+        description: 插件自动填写的任务编号，可留空
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: butterfly-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  import:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts
+      - name: Test publisher
+        run: npm run test:publisher
+      - name: Read and convert Feishu document
+        id: note
+        env:
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+          FEISHU_DOCUMENT_URL: ${{ inputs.document_url }}
+          FEISHU_SLUG: ${{ inputs.slug }}
+          FEISHU_CATEGORY: ${{ inputs.category }}
+        run: npm run import:feishu
+      - name: Build and validate before publishing
+        run: |
+          npm run build
+          npm run check
+      - name: Save verified source
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- source/_posts data/feishu-posts.json
+          if [ -d source/images/feishu ]; then git add -- source/images/feishu; fi
+          if ! git diff --cached --quiet; then
+            git commit -m "Publish Feishu note"
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+      - name: Link to article
+        env:
+          NOTE_SLUG: ${{ steps.note.outputs.slug }}
+        run: echo "Article after successful deployment - https://minxing-liu.github.io/notes/$NOTE_SLUG/" >> "$GITHUB_STEP_SUMMARY"
+  deploy:
+    needs: import
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

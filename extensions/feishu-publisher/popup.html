@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>发布笔记</title><link rel="stylesheet" href="style.css"></head>
+<body class="popup"><header><span class="mark">M.</span><a id="settings" href="options.html" target="_blank">设置</a></header>
+<p class="eyebrow">FEISHU / ACADEMIC NOTES</p><h1>写完，发布。</h1><p class="muted">将这篇飞书笔记更新到你的学术网站。</p>
+<form id="publish-form"><label>飞书文档链接<input id="document-url" type="url" required placeholder="https://…feishu.cn/docx/…"></label>
+<details><summary>文章设置 · 可选</summary><label>网址简称<input id="slug" maxlength="80" placeholder="例如 svd-notes；留空自动生成"></label><p class="hint">首次发布时设置，以后留空会更新同一篇文章。</p><label>分类<input id="category" maxlength="60" placeholder="首次默认为：数学工具"></label></details>
+<p class="destination">发布仓库 <strong id="destination">请先设置</strong><br>正文与图片将公开到网站和 GitHub。</p>
+<button id="publish" type="submit">发布到网站 <span>↗</span></button></form>
+<p id="status" role="status" aria-live="polite"></p><a id="run-link" target="_blank" rel="noopener" hidden>查看发布进度 / 错误日志</a>
+<script src="popup.mjs" type="module"></script></body></html>

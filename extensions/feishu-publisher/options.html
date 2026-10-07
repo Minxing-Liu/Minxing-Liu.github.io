@@ -1,0 +1,7 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>飞书发布 · 设置</title><link rel="stylesheet" href="style.css"></head>
+<body class="options"><span class="mark">M.</span><p class="eyebrow">ONE-TIME SETUP</p><h1>连接你的学术网站</h1><p class="muted">配置一次，之后在飞书页面点击插件即可发布。</p>
+<p><a href="https://github.com/Minxing-Liu/Minxing-Liu.github.io/blob/main/docs/feishu-publisher.md" target="_blank" rel="noopener">打开完整安装与飞书授权指南 ↗</a></p>
+<form id="settings-form"><label>GitHub 仓库<input id="repo" required value="Minxing-Liu/Minxing-Liu.github.io"></label><label>GitHub Fine-grained Token<input id="token" type="password" autocomplete="off" spellcheck="false" placeholder="只授予本仓库的 Actions 读写权限"></label>
+<p class="hint">Token 仅保存于此浏览器的扩展存储，不同步到云端。留空保留已有 Token。飞书 App Secret 请填写到 GitHub Secrets，勿填在这里。</p><button type="submit">检查连接并保存</button></form>
+<p id="status" role="status" aria-live="polite"></p><div class="row"><button id="forget" class="secondary">移除授权</button><button id="clear-job" class="secondary">清除上次任务记录</button></div><p class="hint">清除记录不会取消 GitHub 上的任务。只有确认上一项已结束或未创建时才使用。</p>
+<script type="module" src="options.mjs"></script></body></html>

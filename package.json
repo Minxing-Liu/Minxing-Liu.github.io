@@ -8,7 +8,10 @@
     "server": "hexo server",
     "build": "hexo clean && hexo generate",
     "check": "node tools/check-build.cjs",
-    "new:note": "node tools/new-note.cjs"
+    "new:note": "node tools/new-note.cjs",
+    "import:feishu": "node tools/feishu-import.mjs",
+    "test:publisher": "node --test tests/feishu-publisher.test.mjs",
+    "package:publisher": "python3 tools/package-publisher.py"
   },
   "hexo": {
     "version": "8.1.1"

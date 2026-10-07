@@ -9,12 +9,14 @@ permissions:
   contents: read
 concurrency:
   group: butterfly-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -22,6 +24,7 @@ jobs:
         run: npm ci --ignore-scripts
       - name: Build and check
         run: |
+          npm run test:publisher
           npm run build
           npm run check
       - name: Save preview and reproducible lockfile
