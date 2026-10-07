@@ -1,0 +1,441 @@
+---
+title: 自适应预处理网络：模型与推导
+date: '2026-06-10'
+updated: '2026-06-10'
+permalink: notes/adaptive-preprocessing/
+description: 从目标函数、网络动力学到权重更新，逐步梳理自适应预处理模型。
+categories:
+- 研究笔记
+tags:
+- 理论模型
+- 嗅觉编码
+katex: true
+comments: false
+---
+
+<p>这篇笔记只解决一个核心问题：</p>
+<blockquote>
+<p>为什么这个 ORN-LN 自适应预处理网络的输出 <code>y</code> 会比输入 <code>x</code> 更去相关？<code>z</code>、<code>K</code>、LC 和 NNC 到底在里面做了什么？</p>
+</blockquote>
+<p>我先用很慢的直觉解释，再放回论文里的公式语言。</p>
+<hr>
+<h2 id="0-先把变量认清楚">0. 先把变量认清楚</h2><table>
+<thead>
+<tr>
+<th>记号</th>
+<th>含义</th>
+<th>可以先粗略理解成</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>x</code></td>
+<td>ORN soma 的原始输入活动</td>
+<td>还没预处理的气味响应</td>
+</tr>
+<tr>
+<td><code>y</code></td>
+<td>ORN axon 的输出活动</td>
+<td>预处理之后送往下游的表示</td>
+</tr>
+<tr>
+<td><code>z</code></td>
+<td>LN / lateral population 的活动</td>
+<td>负责发现“共同模式”的侧向神经元</td>
+</tr>
+<tr>
+<td><code>W</code></td>
+<td>ORN-LN 之间学到的权重</td>
+<td>哪些 ORN 模式会驱动哪些 LN</td>
+</tr>
+<tr>
+<td><code>M</code></td>
+<td>LN-LN 之间的竞争 / 抑制结构</td>
+<td>LN 之间避免重复解释同一个模式</td>
+</tr>
+<tr>
+<td><code>K</code></td>
+<td>LN 数量，也就是 <code>z</code> 的维度</td>
+<td>最多有多少个侧向通道去解释共享结构</td>
+</tr>
+</tbody></table>
+<p>最简单的回路图是：</p>
+<blockquote>
+<p>odor stimulus → ORN soma activity <code>x</code> → ORN axon output <code>y</code> → downstream</p>
+</blockquote>
+<p>同时，<code>y</code> 会驱动 LN activity <code>z</code>，而 <code>z</code> 又通过 inhibitory feedback 反过来影响 <code>y</code>。</p>
+<p>所以 <code>y</code> 不是单独由 <code>x</code> 决定的。<code>y</code> 是 <code>x</code> 和 LN 反馈一起达到平衡后的结果。</p>
+<hr>
+<h2 id="1-去相关到底是什么意思">1. 去相关到底是什么意思</h2><p>先不要想 PCA。先想一个更简单的问题。</p>
+<p>假设有两个 ORN：<code>x₁</code> 和 <code>x₂</code>。如果很多气味来了以后，它们总是一起变大、一起变小，那么这两个通道就是相关的。</p>
+<p>这种相关通常说明两件事：</p>
+<ol>
+<li>它们各自有自己的信息。</li>
+<li>它们还共享了一部分重复信息。</li>
+</ol>
+<p>比如：</p>
+<table>
+<thead>
+<tr>
+<th>气味</th>
+<th align="right"><code>x₁</code></th>
+<th align="right"><code>x₂</code></th>
+<th>直觉</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A</td>
+<td align="right">高</td>
+<td align="right">高</td>
+<td>两个 ORN 都被共同因素推高</td>
+</tr>
+<tr>
+<td>B</td>
+<td align="right">低</td>
+<td align="right">低</td>
+<td>两个 ORN 都低</td>
+</tr>
+<tr>
+<td>C</td>
+<td align="right">中</td>
+<td align="right">中</td>
+<td>仍然一起动</td>
+</tr>
+</tbody></table>
+<p>这里 <code>x₁</code> 和 <code>x₂</code> 的共同升降可能来自总浓度、某个分子族、背景响应，或者某个 dominant chemical block。这个共同升降就是冗余。</p>
+<p>去相关不是把信息删掉，而是让输出里的“共同升降”少一点。理想效果是：</p>
+<blockquote>
+<p><code>x</code> 里很多 ORN 总是一起动；经过预处理后，<code>y</code> 里这种一起动的成分被压小了，于是不同通道更能表达各自独立的部分。</p>
+</blockquote>
+<p>这就是为什么论文常看 covariance matrix、correlation matrix、eigenvalue spectrum 和 effective dimension。它们都是在问：</p>
+<blockquote>
+<p>输出 <code>y</code> 还会不会被少数几个共同方向支配？</p>
+</blockquote>
+<hr>
+<h2 id="2-先用一个新手版比喻理解">2. 先用一个新手版比喻理解</h2><p>把 <code>x</code> 想成一群学生一起交作业。每个学生有自己的答案，但他们里面有一段话是全班都差不多的套话。</p>
+<ul>
+<li>每个学生自己的答案：有用的个体差异。</li>
+<li>全班都差不多的套话：重复的共享结构。</li>
+<li>老师看多了以后发现：这段套话每次都出现。</li>
+<li>老师之后批改时会把套话的影响压低一点，让真正不同的部分更显眼。</li>
+</ul>
+<p>在网络里：</p>
+<ul>
+<li><code>x</code> 是原始答案。</li>
+<li><code>z</code> 像“发现套话模式”的检查器。</li>
+<li><code>Wz</code> 是检查器反馈回来的“这部分像套话，要压一下”。</li>
+<li><code>y = x - γ²Wz</code> 就是被压过之后的输出。</li>
+</ul>
+<p>注意：这不是把套话整段删光。因为有时那段共同结构里也有有用信息。网络做的是压缩，不是清零。</p>
+<hr>
+<h2 id="3-为什么-y-能去掉-x-里的相关结构">3. 为什么 <code>y</code> 能去掉 <code>x</code> 里的相关结构</h2><h3 id="3-1-第一步：相关结构就是“经常一起出现的方向”">3.1 第一步：相关结构就是“经常一起出现的方向”</h3><p>输入的 covariance 可以写成 <code>Cₓ = E[xxᵀ]</code>。</p>
+<p>这句话的意思是：我们统计很多气味刺激下，ORN 活动 <code>x</code> 的哪些维度经常一起变化。</p>
+<p>如果 <code>Cₓ</code> 有一个很大的 eigenvalue，意思就是：</p>
+<blockquote>
+<p>在某个方向上，输入变化特别大；很多样本都沿着这个方向一起涨落。</p>
+</blockquote>
+<p>这个方向可能对应总浓度，也可能对应某个分子族共同激活很多 ORN。</p>
+<p>所以“强相关结构”不是神秘东西。它就是数据里反复出现、幅度很大、很多 ORN 一起参与的共同模式。</p>
+<h3 id="3-2-第二步：为什么-LN-会优先看到这些共同模式">3.2 第二步：为什么 LN 会优先看到这些共同模式</h3><p>LN 的活动 <code>z</code> 是被 <code>Wᵀy</code> 驱动的。直觉上，<code>Wᵀy</code> 在问：</p>
+<blockquote>
+<p>当前输出 <code>y</code> 里面，有多少成分像我这个 LN 已经学到的模式？</p>
+</blockquote>
+<p>如果某个模式在数据里经常出现、幅度又大，它就更容易反复驱动某些 LN。长期学习以后，<code>W</code> 会更稳定地对这些模式敏感。</p>
+<p>这一步非常关键：</p>
+<blockquote>
+<p><code>z</code> 不是手动算出来的 PCA 坐标，但它会被高方差、强相关、反复出现的结构强烈驱动。</p>
+</blockquote>
+<p>所以你觉得“<code>z</code> 好像学到了前 K 个特征空间”，这个直觉有一部分对：它确实倾向于捕捉主导共享结构。</p>
+<p>但它不等于 PCA 里的“前 K 个 component”。它是由电路动力学、非负约束、<code>W</code>、<code>M</code>、<code>ρ</code>、<code>γ</code> 共同决定的 LN 活动。</p>
+<h3 id="3-3-第三步：为什么被-LN-看到以后，y-里的相关结构会变小">3.3 第三步：为什么被 LN 看到以后，<code>y</code> 里的相关结构会变小</h3><p>LC 的第一条稳态关系可以写成：</p>
+<blockquote>
+<p><code>y = x - γ²Wz</code></p>
+</blockquote>
+<p>这句话可以慢慢读：</p>
+<ul>
+<li><code>x</code> 是原始输入。</li>
+<li><code>Wz</code> 是 LN 根据当前模式产生的反馈信号。</li>
+<li><code>γ²Wz</code> 是反馈强度。</li>
+<li><code>y</code> 是输入减去这部分反馈后的输出。</li>
+</ul>
+<p>如果某个共享模式很强，它会强烈驱动 <code>z</code>。<code>z</code> 一强，<code>Wz</code> 也强。于是这个共享模式在 <code>y</code> 里被压得更多。</p>
+<p>如果某个方向本来就弱、不是很多 ORN 共同参与，它驱动 <code>z</code> 不强，反馈也弱，于是它在 <code>y</code> 里被保留得更多。</p>
+<p>所以整个过程像这样：</p>
+<ol>
+<li><code>x</code> 里有一个经常出现的共同模式。</li>
+<li>这个共同模式让多个 ORN 一起变大，因此 covariance 里出现强方向。</li>
+<li>强方向更容易激活 LN，也更容易被 <code>W</code> 学到。</li>
+<li>LN 被激活后，通过 <code>Wz</code> 反馈到 ORN output。</li>
+<li>反馈项在 <code>y = x - γ²Wz</code> 里把这个共同模式压小。</li>
+<li>共同模式压小后，通道之间就没那么一起涨落了。</li>
+<li>因此 <code>y</code> 的 correlation matrix 更接近对角，spectrum 更平，effective dimension 更高。</li>
+</ol>
+<p>这就是“输出 <code>y</code> 能去掉 <code>x</code> 中相关性结构”的核心原因。</p>
+<p>更短地说：</p>
+<blockquote>
+<p>强相关结构会更容易驱动 LN；LN 又专门反馈抑制它驱动到的结构；所以强相关结构在输出 <code>y</code> 中被优先压缩。</p>
+</blockquote>
+<h3 id="3-4-但-y-不是-x-减去前-K-个-PCA-方向">3.4 但 <code>y</code> 不是 <code>x</code> 减去前 K 个 PCA 方向</h3><p>这个区别很重要。</p>
+<p>错误理解：</p>
+<blockquote>
+<p><code>z</code> 等于前 <code>K</code> 个 PCA features，<code>y</code> 等于 <code>x</code> 减去这些 features。</p>
+</blockquote>
+<p>更准确的理解：</p>
+<blockquote>
+<p><code>z</code> 是一个 <code>K</code> 维的侧向活动空间，它倾向于表示输入中强、常见、共享的模式。<code>y</code> 是在 <code>x</code> 和 LN feedback 互相耦合后得到的平衡输出。</p>
+</blockquote>
+<p>为什么不能说成“直接减去前 K 个 PCA 方向”？</p>
+<ol>
+<li>PCA 是先全局计算 <code>Cₓ</code>，再显式求 eigenvectors。这个网络不是这样做的。</li>
+<li><code>z</code> 不是只由 <code>x</code> 决定，而是由当前的 <code>y</code>、<code>W</code>、<code>M</code> 和反馈平衡共同决定。</li>
+<li><code>Wz</code> 不是硬投影删除，而是连续的 feedback shrinkage。</li>
+<li>NNC 里还有 <code>y ≥ 0</code> 和 <code>z ≥ 0</code>，因此它更像非负特征或 soft cluster，而不是普通线性 PCA 坐标。</li>
+</ol>
+<p>所以你可以把它理解成：</p>
+<blockquote>
+<p>PCA whitening 是工程上“先算清楚所有方向，再精确除以每个方向的标准差”。</p>
+</blockquote>
+<blockquote>
+<p>LC / NNC 是生物回路里“用 LN 学到常见共享模式，再用反馈把这些模式压下去”。</p>
+</blockquote>
+<p>这两个结果可能相似，但实现方式不同。</p>
+<hr>
+<h2 id="4-LC-的去相关原理">4. LC 的去相关原理</h2><p>LC 指 linear circuit。活动方程是：</p>
+<ul>
+<li><code>dy/dτ = -y - γ²Wz + x</code></li>
+<li><code>dz/dτ = -Mz + (ρ² / γ²)Wᵀy</code></li>
+</ul>
+<p>看第一条：</p>
+<blockquote>
+<p><code>dy/dτ = -y - γ²Wz + x</code></p>
+</blockquote>
+<p>它包含三股力量：</p>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>+x</code></td>
+<td>原始 ORN soma 输入把 <code>y</code> 往上推</td>
+</tr>
+<tr>
+<td><code>-y</code></td>
+<td>活动自身衰减，防止无限变大</td>
+</tr>
+<tr>
+<td><code>-γ²Wz</code></td>
+<td>LN 反馈抑制，把学到的共享模式压下去</td>
+</tr>
+</tbody></table>
+<p>看第二条：</p>
+<blockquote>
+<p><code>dz/dτ = -Mz + (ρ² / γ²)Wᵀy</code></p>
+</blockquote>
+<p>它也包含几股力量：</p>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Wᵀy</code></td>
+<td>当前 <code>y</code> 有多像每个 LN 学到的模式</td>
+</tr>
+<tr>
+<td><code>ρ² / γ²</code></td>
+<td>调节 <code>y</code> 驱动 <code>z</code> 的相对强度</td>
+</tr>
+<tr>
+<td><code>-Mz</code></td>
+<td>LN-LN 竞争，避免所有 LN 都学同一个东西</td>
+</tr>
+</tbody></table>
+<p>所以 LC 的逻辑是：</p>
+<ol>
+<li><code>x</code> 推动 <code>y</code>。</li>
+<li><code>y</code> 驱动 <code>z</code>。</li>
+<li><code>z</code> 通过 <code>Wz</code> 反过来抑制 <code>y</code>。</li>
+<li>反复出现的高方差方向会产生更强反馈。</li>
+<li>这些方向在 <code>y</code> 里被压缩。</li>
+</ol>
+<p>这叫 partial decorrelation 或 partial whitening。它不是完整 whitening，因为它不会保证 <code>Cᵧ = I</code>。</p>
+<hr>
+<h2 id="5-NNC-的去相关原理">5. NNC 的去相关原理</h2><p>NNC 指 nonnegative circuit。它和 LC 很像，但多了非负约束：</p>
+<blockquote>
+<p><code>y ≥ 0</code>，<code>z ≥ 0</code></p>
+</blockquote>
+<p>离散形式可以写成：</p>
+<ul>
+<li><code>y(τ + 1) = [y(τ) + η(-y - Wz + x)]₊</code></li>
+<li><code>z(τ + 1) = [z(τ) + η(-Mz + ρ²Wᵀy)]₊</code></li>
+</ul>
+<p>其中 <code>[a]₊ = max(0, a)</code>。</p>
+<p>非负约束会改变直觉。LC 里的 <code>z</code> 可以正负变化，所以更像线性子空间变量；NNC 里的 <code>z</code> 只能非负，所以更像：</p>
+<ul>
+<li>某类 odor feature 的激活强度。</li>
+<li>当前气味属于某个 soft cluster 的程度。</li>
+<li>某组 ORN 共同活动模式的“存在量”。</li>
+</ul>
+<p>所以 NNC 的去相关可以这样理解：</p>
+<ol>
+<li>某个气味来了，激活一组 ORN。</li>
+<li>如果这个 ORN pattern 很像过去常见的某个模式，对应的 LN <code>z</code> 会变大。</li>
+<li>这个 LN 通过 <code>Wz</code> 抑制相关 ORN output。</li>
+<li>常见模式被压缩，剩下的输出更强调差异部分。</li>
+<li>因为 <code>z</code> 非负，它更像“这个模式出现了多少”，而不是“沿 PCA 轴的正负坐标”。</li>
+</ol>
+<p>因此 NNC 的一句话解释是：</p>
+<blockquote>
+<p>NNC 用非负 LN feature / soft cluster 来识别常见 ORN 活动模式，再用模式特异性的反馈抑制降低冗余。</p>
+</blockquote>
+<hr>
+<h2 id="6-K-越大为什么常常效果越好">6. <code>K</code> 越大为什么常常效果越好</h2><p>你观察到 <code>K</code> 越大，去相关效果确实更好，这个现象很合理。</p>
+<p><code>K</code> 是 LN 的数量，也就是 <code>z</code> 的维度。它决定网络有多少个“侧向检查器”可以去发现共享模式。</p>
+<p>可以这样想：</p>
+<table>
+<thead>
+<tr>
+<th align="right"><code>K</code></th>
+<th>网络能做什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right"><code>K = 0</code></td>
+<td>没有 LN 反馈，<code>y</code> 基本就是 <code>x</code>，相关结构还在</td>
+</tr>
+<tr>
+<td align="right"><code>K = 1</code></td>
+<td>只能重点压一个最明显的共同模式，比如总浓度轴</td>
+</tr>
+<tr>
+<td align="right"><code>K = 5</code></td>
+<td>可以压几个共同模式，比如浓度轴加几个分子族轴</td>
+</tr>
+<tr>
+<td align="right"><code>K</code> 更大</td>
+<td>可以覆盖更多高方差 / 高相关方向</td>
+</tr>
+</tbody></table>
+<p>所以在输入确实有多个共享相关方向时，<code>K</code> 增大通常会让去相关变强。原因不是“数学上强行删除更多 PCA component”，而是：</p>
+<blockquote>
+<p>LN 通道更多，网络可以学到并反馈压缩更多种共享模式。</p>
+</blockquote>
+<p>但这里也有边界。</p>
+<p><code>K</code> 越大不一定永远越好，因为：</p>
+<ol>
+<li>如果主要相关结构已经被前几个 LN 处理了，再增加 <code>K</code> 的收益会变小。</li>
+<li>如果 <code>K</code> 太大而数据样本不够，网络可能学到噪声或不稳定模式。</li>
+<li>如果反馈太强，可能把任务相关的信息也压掉。</li>
+<li>真正压缩多强还取决于 <code>ρ</code>、<code>γ</code>、学习率和输入统计。</li>
+</ol>
+<p>所以更准确的说法是：</p>
+<blockquote>
+<p>在共享相关结构较多、学习稳定、参数合适时，较大的 <code>K</code> 通常带来更强的 partial decorrelation；但它增加的是反馈容量，不是保证输出维度等于 <code>K</code>，也不是保证越大越无限好。</p>
+</blockquote>
+<hr>
+<h2 id="7-参数对去相关的影响">7. 参数对去相关的影响</h2><h3 id="7-1-K：能处理多少类共享模式">7.1 <code>K</code>：能处理多少类共享模式</h3><p><code>K</code> 控制 LN population 的容量。</p>
+<ul>
+<li><code>K</code> 小：只能压最强、最明显的相关方向。</li>
+<li><code>K</code> 大：可以压更多相关方向。</li>
+<li><code>K</code> 太大：收益可能饱和，也可能受样本量和噪声影响。</li>
+</ul>
+<p>可以把 <code>K</code> 叫做“可学习共享模式的数量上限”，不要直接叫“PCA component 数量”。</p>
+<h3 id="7-2-ρ：压缩强度和输入尺度的相对参数">7.2 <code>ρ</code>：压缩强度和输入尺度的相对参数</h3><p><code>ρ</code> 控制 <code>y</code> 驱动 <code>z</code> 的强度，也影响反馈压缩的有效强度。</p>
+<p>直觉上：</p>
+<ul>
+<li><code>ρ</code> 太小：LN 不够活跃，反馈弱，去相关弱。</li>
+<li><code>ρ</code> 适中：主导共享方向被明显压缩。</li>
+<li><code>ρ</code> 太大：压缩可能过强，活动尺度和稳定性可能受影响。</li>
+</ul>
+<p>所以 <code>ρ</code> 不是简单的“越大越好”，而是控制 partial whitening 的强度。</p>
+<h3 id="7-3-γ：反馈尺度和活动尺度匹配">7.3 <code>γ</code>：反馈尺度和活动尺度匹配</h3><p>在 LC 里，<code>γ</code> 同时出现在 <code>γ²Wz</code> 和 <code>(ρ² / γ²)Wᵀy</code> 里。</p>
+<p>它影响：</p>
+<ul>
+<li><code>z</code> 对 <code>y</code> 的反馈强度。</li>
+<li><code>y</code> 对 <code>z</code> 的驱动强度。</li>
+<li>权重和活动的尺度匹配。</li>
+<li>动力学稳定性。</li>
+</ul>
+<p>所以 <code>γ</code> 更像电路实现中的尺度参数，不是单独的“去相关按钮”。</p>
+<h3 id="7-4-W-和-M：一个学-ORN-LN-模式，一个学-LN-LN-竞争">7.4 <code>W</code> 和 <code>M</code>：一个学 ORN-LN 模式，一个学 LN-LN 竞争</h3><p>慢学习规则的直觉是：</p>
+<blockquote>
+<p><code>W</code> 学 <code>y</code> 和 <code>z</code> 的共同活动；<code>M</code> 学 <code>z</code> 和 <code>z</code> 的共同活动。</p>
+</blockquote>
+<p><code>W</code> 让 LN 知道哪些 ORN 输出模式经常一起出现。</p>
+<p><code>M</code> 让 LN 之间相互竞争，避免所有 LN 都表示同一个最强模式。</p>
+<p>没有 <code>M</code> 的竞争，多个 LN 可能都盯着同一个 dominant direction，容量被浪费。</p>
+<p>有了 <code>M</code>，不同 LN 更容易分工，覆盖多个共享结构。</p>
+<hr>
+<h2 id="8-怎么判断模型真的去相关了">8. 怎么判断模型真的去相关了</h2><p>不要只看分类准确率。去相关和分类准确率不是一个东西。</p>
+<p>如果 LC / NNC 真的让表示更去相关，你应该看到：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>期待变化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>mean absolute off-diagonal correlation</td>
+<td>下降</td>
+</tr>
+<tr>
+<td>covariance eigenvalue spectrum</td>
+<td>更平</td>
+</tr>
+<tr>
+<td>explained variance of PC1</td>
+<td>下降</td>
+</tr>
+<tr>
+<td>effective dimension</td>
+<td>上升</td>
+</tr>
+<tr>
+<td>correlation heatmap</td>
+<td>非对角线变淡</td>
+</tr>
+<tr>
+<td>PCA scatter</td>
+<td>不再被单一方向强烈拉长</td>
+</tr>
+</tbody></table>
+<p>分类准确率可能上升，也可能不明显。原因是：</p>
+<blockquote>
+<p>去相关改善的是表示效率和冗余结构；分类准确率还取决于标签边界是否刚好受益于这种几何改变。</p>
+</blockquote>
+<p>如果标签本来就沿着 ORN 的高方差方向很好分开，强行压缩这个方向不一定提高分类。</p>
+<hr>
+<h2 id="9-最容易混淆的四句话">9. 最容易混淆的四句话</h2><h3 id="混淆-1：z-是不是-PCA-的前-K-个成分？">混淆 1：<code>z</code> 是不是 PCA 的前 <code>K</code> 个成分？</h3><p>不是。</p>
+<p>更准确地说：</p>
+<blockquote>
+<p><code>z</code> 是一个由电路学习出来的 <code>K</code> 维侧向活动，它倾向于响应输入中的主导共享结构。</p>
+</blockquote>
+<p>它可能和 PCA 主方向相似，但不是显式 PCA。</p>
+<h3 id="混淆-2：y-是不是-x-减去前-K-个主成分？">混淆 2：<code>y</code> 是不是 <code>x</code> 减去前 <code>K</code> 个主成分？</h3><p>不是。</p>
+<p>更准确地说：</p>
+<blockquote>
+<p><code>y</code> 是 <code>x</code> 在 LN feedback 下达到平衡后的输出；强共享模式被连续压缩，而不是被硬删除。</p>
+</blockquote>
+<h3 id="混淆-3：K-越大是不是一定越好？">混淆 3：<code>K</code> 越大是不是一定越好？</h3><p>不一定，但常常会更好。</p>
+<p>如果输入里有很多共享相关方向，更多 LN 能处理更多模式，所以去相关增强。</p>
+<p>但如果主要共享结构已经处理完，或者数据噪声很大，再增加 <code>K</code> 的收益会下降。</p>
+<h3 id="混淆-4：LC-NNC-是不是完整-whitening？">混淆 4：LC / NNC 是不是完整 whitening？</h3><p>不是。</p>
+<p>完整 PCA whitening 会让 <code>Cᵧ = I</code>。LC / NNC 更适合说成：</p>
+<blockquote>
+<p>partial whitening, normalization, and decorrelation。</p>
+</blockquote>
+<p>中文就是：</p>
+<blockquote>
+<p>部分白化、归一化和去相关。</p>
+</blockquote>
+<hr>
+<h2 id="10-可以直接写进论文的版本">10. 可以直接写进论文的版本</h2><p>自适应预处理网络可以理解为一种由 similarity matching 原理推导出的 ORN-LN 回路。该网络并不显式计算 PCA，也不直接删除输入的前 <code>K</code> 个主成分；相反，它通过 ORN 输出活动 <code>y</code> 与侧向 LN 活动 <code>z</code> 之间的快速反馈动力学，以及 ORN-LN、LN-LN 突触的慢速局部学习，逐渐捕捉输入表示中反复出现的高方差共享结构。由于这些共享结构更容易驱动 LN 活动，它们会通过 <code>Wz</code> 反馈项在 ORN axon output 中被优先压缩，从而降低通道间相关性、平坦化协方差谱，并提高表示的有效维度。因此，该模型的去相关作用应理解为生物可实现的部分去相关或部分白化，而不是严格的 PCA whitening。参数 <code>K</code> 控制侧向群体能够表示的共享模式数量上限；较大的 <code>K</code> 通常允许网络压缩更多主导相关方向，但最终效果仍取决于输入统计、<code>ρ</code>、<code>γ</code>、学习动态和非负约束。</p>
+<hr>
+<h2 id="11-一句话记忆">11. 一句话记忆</h2><blockquote>
+<p><code>z</code> 不是 PCA component，而是一组会被常见共享模式激活的 LN feedback handles；<code>y</code> 不是把这些方向硬删掉后的残差，而是把强相关模式压小后的 ORN 输出。</p>
+</blockquote>

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 520" role="img" aria-label="Abstract neural activity banner">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#102033"/>
+      <stop offset="0.48" stop-color="#173c45"/>
+      <stop offset="1" stop-color="#f3b55d"/>
+    </linearGradient>
+    <radialGradient id="pulse" cx="72%" cy="38%" r="55%">
+      <stop offset="0" stop-color="#f7f0d5" stop-opacity="0.5"/>
+      <stop offset="0.48" stop-color="#65c3b4" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#102033" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft">
+      <feGaussianBlur stdDeviation="1.5"/>
+    </filter>
+  </defs>
+  <rect width="1600" height="520" fill="url(#bg)"/>
+  <rect width="1600" height="520" fill="url(#pulse)"/>
+  <g fill="none" stroke="#d9f3ee" stroke-opacity="0.22" stroke-width="2">
+    <path d="M0 370 C180 260 265 295 420 190 S705 115 865 235 1120 380 1600 205"/>
+    <path d="M0 260 C220 175 300 345 500 245 S770 130 960 300 1225 335 1600 135"/>
+    <path d="M0 430 C210 365 335 435 535 315 S850 220 1035 385 1280 445 1600 315"/>
+  </g>
+  <g stroke="#f8d38a" stroke-opacity="0.5" stroke-width="2" fill="none">
+    <path d="M165 350 L285 278 L420 190 L555 242 L680 170 L845 232 L1000 325 L1180 270 L1360 205"/>
+    <path d="M230 185 L380 250 L520 222 L690 318 L860 266 L1035 385 L1225 335 L1430 390"/>
+  </g>
+  <g filter="url(#soft)">
+    <g fill="#f8d38a">
+      <circle cx="165" cy="350" r="7"/><circle cx="420" cy="190" r="7"/><circle cx="680" cy="170" r="8"/>
+      <circle cx="845" cy="232" r="7"/><circle cx="1000" cy="325" r="8"/><circle cx="1360" cy="205" r="7"/>
+    </g>
+    <g fill="#d9f3ee">
+      <circle cx="285" cy="278" r="5"/><circle cx="555" cy="242" r="5"/><circle cx="860" cy="266" r="5"/>
+      <circle cx="1180" cy="270" r="5"/><circle cx="1430" cy="390" r="5"/>
+    </g>
+  </g>
+  <g fill="#ffffff" fill-opacity="0.14">
+    <circle cx="1250" cy="105" r="2"/><circle cx="1310" cy="150" r="2"/><circle cx="1190" cy="170" r="2"/>
+    <circle cx="1110" cy="95" r="2"/><circle cx="1455" cy="110" r="2"/><circle cx="1500" cy="230" r="2"/>
+    <circle cx="980" cy="120" r="2"/><circle cx="780" cy="95" r="2"/><circle cx="610" cy="120" r="2"/>
+  </g>
+</svg>

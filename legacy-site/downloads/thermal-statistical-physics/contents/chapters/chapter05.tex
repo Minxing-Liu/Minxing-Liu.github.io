@@ -1,0 +1,84 @@
+\chapter{不可逆过程热力学简介}
+
+\section{不可逆过程的基本问题}
+
+不可逆过程热力学讨论系统偏离平衡后如何发生输运并趋向平衡。和平衡态热力学不同，这里关心空间或时间上的非均匀性，例如温度梯度引起热流、化学势梯度引起扩散、速度梯度引起黏滞耗散。基本对象是局域平衡、熵产生、热力学力与流，以及近平衡线性响应。
+
+\begin{keybox}
+\textbf{核心线索：}非平衡约束产生热力学力 $X_i$，系统响应为通量 $J_i$，熵产生率满足
+\[
+  \sigma_s=\sum_i J_iX_i\ge 0.
+\]
+近平衡时，通量与热力学力之间近似线性相关。
+\end{keybox}
+
+\section{局域平衡假设}
+
+不可逆过程研究非平衡系统如何趋向平衡。若系统在宏观上非均匀，但每个足够小的体元仍可近似看作平衡态，就称为局域平衡。此时可定义局域变量
+\[
+  T(\bm r,t),\qquad \mu(\bm r,t),\qquad
+  s(\bm r,t),\qquad n(\bm r,t).
+\]
+局域平衡是写连续介质方程和输运定律的前提。
+
+\section{熵产生}
+
+孤立系统中不可逆过程满足
+\[
+  \frac{\dd S}{\dd t}\ge 0.
+\]
+对开放体元，熵变化可分成熵流和熵产生：
+\[
+  \frac{\dd S}{\dd t}
+  =\frac{\dd_e S}{\dd t}+\frac{\dd_i S}{\dd t},
+  \qquad
+  \frac{\dd_i S}{\dd t}\ge 0.
+\]
+其中 $\dd_e S$ 来自与外界交换，$\dd_i S$ 来自内部不可逆性。
+
+典型例子是热传导。热流从高温流向低温，局域熵产生率可写成
+\[
+  \sigma_s=\bm J_q\cdot \nabla\left(\frac{1}{T}\right)\ge 0.
+\]
+结合 Fourier 定律
+\[
+  \bm J_q=-\kappa\nabla T,
+\]
+可验证当 $\kappa>0$ 时熵产生为正。
+
+\section{热力学力与流}
+
+线性不可逆热力学把熵产生率写成“流”和“力”的乘积：
+\[
+  \sigma_s=\sum_i J_iX_i .
+\]
+常见对应关系：
+\[
+  \text{heat flow: } \bm J_q,\qquad
+  X_q=\nabla(1/T),
+\]
+\[
+  \text{particle diffusion: } \bm J_N,\qquad
+  X_N=-\nabla(\mu/T).
+\]
+近平衡时，流与力近似线性相关：
+\[
+  J_i=\sum_j L_{ij}X_j .
+\]
+
+\section{Onsager 倒易关系}
+
+若微观动力学满足时间反演对称性，线性响应系数满足 Onsager 倒易关系
+\[
+  L_{ij}=L_{ji}.
+\]
+它说明交叉输运效应不是任意的。例如温度梯度可驱动粒子流，化学势梯度也可伴随热流；两者的交叉系数彼此相关。
+
+\section{和统计物理的连接}
+
+不可逆过程在本科热统中通常只给出现象学形式；在高等统计物理中，输运系数可由平衡涨落或时间关联函数给出，例如 Green-Kubo 关系的思想：
+\[
+  \text{transport coefficient}
+  \sim \int_0^\infty \avg{J(t)J(0)}\dd t .
+\]
+因此第五章的核心是：用局域平衡描述弱非平衡系统，用熵产生判断不可逆性，用线性响应和 Onsager 关系组织输运现象。

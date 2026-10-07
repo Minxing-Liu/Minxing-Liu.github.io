@@ -1,0 +1,203 @@
+nav:
+  display_title: true
+  display_post_title: true
+  fixed: false
+menu:
+  首页: / || fas fa-home
+  页面||fas fa-compass:
+    归档: /archives/ || fas fa-archive
+    标签: /tags/ || fas fa-tags
+    分类: /categories/ || fas fa-folder-open
+    笔记目录: /notes/ || fas fa-book-open
+    研究: /research/ || fas fa-flask
+    关于: /about/ || fas fa-user
+  文档||fas fa-book:
+    📑 全部笔记: /notes/
+    📐 协方差与 PCA: /notes/covariance-correlation-pca/
+    🧠 神经科学研究: /research/
+    📚 统计物理: /notes/statistical-physics/
+    🫧 软物质物理: /notes/soft-matter/
+  留言板: /messageboard/ || fas fa-comment-dots
+  语言||fas fa-language:
+    English: /en/ || fas fa-e
+    中文: / || fas fa-c
+social:
+  fab fa-github: https://github.com/Minxing-Liu || GitHub
+avatar:
+  img: /img/butterfly-icon.png
+  effect: false
+# 官网同款封面；本地保存背景，避免首屏依赖外部图床。
+index_img: /images/butterfly-hero.jpg
+default_top_img: /images/butterfly-hero.jpg
+archive_img: https://oss.012700.xyz/butterfly/2024/10/archive.jpg
+tag_img: https://oss.012700.xyz/butterfly/2024/10/tag.png
+category_img: https://oss.012700.xyz/butterfly/2024/10/category.jpg
+footer_img: true
+# 留空使用主题默认的全屏高度和居中标题。
+index_top_img_height:
+index_site_info_top:
+subtitle:
+  enable: true
+  effect: true
+  typed_option:
+    loop: true
+    startDelay: 300
+    typeSpeed: 150
+    backSpeed: 50
+    backDelay: 1800
+  source: false
+  sub:
+  - 计算神经科学 · 数学工具 · 研究笔记
+  - 把推导写清楚，把思路留下来。
+  - Stay curious. Keep exploring.
+font:
+  global_font_size: 15px
+blog_title_font:
+  font_link: https://fonts.googleapis.com/css?family=Titillium+Web&display=swap
+  font_family: Titillium Web, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft JhengHei', 'Microsoft YaHei', sans-serif
+canvas_ribbon:
+  enable: true
+  size: 150
+  alpha: 0.6
+  zIndex: -1
+  click_to_change: false
+  mobile: false
+index_layout: 3
+index_post_content:
+  method: 2
+  length: 500
+cover:
+  index_enable: true
+  aside_enable: true
+  archives_enable: true
+  default_cover:
+  - https://oss.012700.xyz/butterfly/2024/11/butterfly-docs-changelog-cover-1.png
+  - https://oss.012700.xyz/butterfly/2024/11/butterfly-docs-changelog-cover-2.png
+  - https://oss.012700.xyz/butterfly/2024/11/butterfly-docs-changelog-cover-3.png
+  - https://oss.012700.xyz/butterfly/2024/11/butterfly-docs-changelog-cover-4.png
+  - https://oss.012700.xyz/butterfly/2024/11/butterfly-docs-changelog-cover-5.png
+  - https://oss.012700.xyz/butterfly/2024/11/butterfly-docs-changelog-cover-6.png
+  - https://oss.012700.xyz/butterfly/2024/11/butterfly-docs-changelog-cover-7.png
+  - https://oss.012700.xyz/butterfly/2024/11/butterfly-docs-changelog-cover-8.png
+  - https://oss.012700.xyz/butterfly/2024/11/butterfly-docs-changelog-cover-9.png
+toc:
+  post: true
+  page: true
+  number: false
+  expand: false
+  scroll_percent: true
+post_copyright:
+  enable: false
+related_post:
+  enable: false
+aside:
+  enable: true
+  button: true
+  mobile: true
+  position: right
+  card_author:
+    enable: true
+    description: 上海交通大学 · 物理与天文学院<br>计算与理论神经科学
+    button:
+      enable: true
+      icon: fab fa-github
+      text: GitHub
+      link: https://github.com/Minxing-Liu
+  card_announcement:
+    enable: true
+    content: 这里记录数学推导、论文阅读与课程笔记。欢迎交流，也欢迎指出推导中的问题。
+  card_recent_post:
+    enable: true
+    limit: 5
+  card_categories:
+    enable: true
+  card_tags:
+    enable: true
+    limit: 40
+    color: true
+  card_archives:
+    enable: true
+    type: monthly
+    format: YYYY年MM月
+    limit: 8
+  card_webinfo:
+    enable: true
+    post_count: true
+    last_push_date: true
+math:
+  use: katex
+  per_page: true
+  hide_scrollbar: false
+  katex:
+    copy_tex: true
+search:
+  use: local_search
+  placeholder: 搜索笔记与公式关键词
+  local_search:
+    preload: false
+    top_n_per_article: 2
+darkmode:
+  enable: true
+  button: true
+  autoChangeMode: 1
+rightside_scroll_percent: true
+readmode: true
+share:
+  use: null
+comments:
+  use: null
+busuanzi:
+  site_uv: false
+  site_pv: false
+  page_pv: false
+footer:
+  nav:
+  - content:
+    - title: 文档
+      item:
+      - title: 全部笔记
+        url: /notes/
+      - title: 协方差与 PCA
+        url: /notes/covariance-correlation-pca/
+      - title: 软物质物理
+        url: /notes/soft-matter/
+  - content:
+    - title: 页面
+      item:
+      - title: 研究
+        url: /research/
+      - title: 关于
+        url: /about/
+      - title: 留言板
+        url: /messageboard/
+  - content:
+    - title: 框架
+      item:
+      - title: Hexo
+        url: https://hexo.io/zh-cn/
+      - title: Butterfly
+        url: https://butterfly.js.org/
+  - content:
+    - title: 语言
+      item:
+      - title: English
+        url: /en/
+      - title: 中文
+        url: /
+  owner:
+    enable: true
+    since: 2026
+  copyright:
+    enable: true
+    version: true
+CDN:
+  internal_provider: local
+  third_party_provider: jsdelivr
+  version: true
+  option:
+    katex: /vendor/katex/katex.min.css
+    katex_copytex: /vendor/katex/copy-tex.min.js
+inject:
+  head:
+  - <link rel="preload" as="image" href="/images/butterfly-hero.jpg">
+  - <link rel="stylesheet" href="/css/academic.css">

@@ -1,0 +1,257 @@
+\chapter{近独立粒子的最概然分布}
+
+\section{先分清三个词：分布、统计、系综}
+
+第 6-9 章最容易混乱，是因为几个词都在描述“很多微观态如何给出宏观性质”。先把层次分清：
+\begin{center}
+\small
+\begin{tabular}{p{0.18\textwidth} p{0.37\textwidth} p{0.36\textwidth}}
+\toprule
+概念 & 回答的问题 & 本章中的位置 \\
+\midrule
+分布 & 每个能级上有多少粒子？ & 用数列 $\{a_l\}$ 表示 \\
+统计 & 给定 $\{a_l\}$ 时，有多少微观态？ & MB, BE, FD 三种计数规则 \\
+系综 & 外界固定哪些宏观量？ & 第 9 章：微正则、正则、巨正则 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{分布}不是先验给出的概率函数，而是占据数表：
+\[
+  \{a_l\}=(a_1,a_2,\ldots).
+\]
+若第 $l$ 个能级为 $\epsilon_l$，简并度为 $\omega_l$，则 $a_l$ 表示有多少粒子处在这个能级上。确定所有 $a_l$，就确定了一个宏观意义上的分布。
+
+\textbf{统计}是计数规则。同一个分布 $\{a_l\}$ 可以对应很多微观态；不同粒子类型的“微观态数”不同，这就是 Boltzmann, Bose, Fermi 统计的来源。
+
+\section{宏观态、微观态与等概率原理}
+
+宏观态由少数宏观量刻画，例如 $E,V,N,T,P$。微观态是系统的力学运动状态，例如经典相空间中的点，或量子力学中的本征态。同一个宏观态通常对应大量微观态。
+
+如果只知道系统满足某些宏观约束，例如
+\[
+  E\to E+\Delta E,\qquad p\to p+\Delta p,
+\]
+则满足这些条件的微观态总数记为
+\[
+  \Omega=\Omega(E,\Delta E,p,\Delta p,\ldots).
+\]
+等概率原理说：孤立平衡系统在给定宏观约束下，各个可能微观态出现概率相等。因此某一个微观态的概率是
+\[
+  P=\frac{1}{\Omega}.
+\]
+
+\begin{keybox}
+\textbf{核心逻辑：}宏观态对应许多微观态；若每个微观态等概率，则最可能出现的宏观分布就是微观态数最大的分布。
+\end{keybox}
+
+\section{能级、简并度和分布}
+
+近独立粒子系统中，总能量近似写成单粒子能级占据数之和：
+\[
+  E=\sum_l a_l\epsilon_l,\qquad N=\sum_l a_l .
+\]
+这里
+\[
+  \epsilon_l = \text{第 }l\text{ 个能级},\qquad
+  \omega_l = \text{能级 }\epsilon_l\text{ 的简并度},
+\]
+\[
+  a_l = \text{能级 }\epsilon_l\text{ 上的粒子数}.
+\]
+
+粒子数守恒时，给定 $E,V,N$ 要满足
+\[
+  \sum_l a_l=N,\qquad
+  \sum_l a_l\epsilon_l=E.
+\]
+粒子数不守恒时，例如光子气体，通常只保留能量约束
+\[
+  \sum_l a_l\epsilon_l=E.
+\]
+
+\begin{keybox}
+\textbf{读题方法：}看到 $\epsilon_l,\omega_l,a_l$，先把题目翻译成“每个能级上放多少粒子”。后面的 MB/BE/FD 都是在数“这种放法对应多少微观态”。
+\end{keybox}
+
+\section{三种统计的物理区别}
+
+三种统计的根本差别不是公式分母里的 $\pm 1$，而是\textbf{粒子是否可分辨}以及\textbf{一个单粒子量子态能容纳多少粒子}。
+
+\begin{center}
+\small
+\begin{tabular}{p{0.16\textwidth} p{0.31\textwidth} p{0.43\textwidth}}
+\toprule
+统计 & 粒子图像 & 单态占据规则与对象 \\
+\midrule
+MB & 经典稀薄极限；交换效应可忽略 & 平均占据很小，$\bar n_l\ll 1$；普通稀薄气体 \\
+BE & 全同玻色子；波函数交换对称 & 同一量子态可有任意多个粒子；光子、声子、$^4$He 原子 \\
+FD & 全同费米子；波函数交换反对称 & Pauli 不相容：每个态最多一个粒子；电子、质子、中子 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Maxwell-Boltzmann 计数}
+
+经典可分辨粒子近似下，给定分布 $\{a_l\}$ 的微观态数为
+\[
+  \Omega_{\rm MB}
+  =\frac{N!}{\prod_l a_l!}\prod_l \omega_l^{a_l}.
+\]
+其中
+\[
+  \frac{N!}{\prod_l a_l!}
+\]
+表示把 $N$ 个粒子分到各能级的方式数，而
+\[
+  \prod_l \omega_l^{a_l}
+\]
+表示各能级内部简并态的选择数。
+
+用 Stirling 公式最大化 $\ln\Omega_{\rm MB}$，并加入约束
+\[
+  \sum_l a_l=N,\qquad
+  \sum_l a_l\epsilon_l=E,
+\]
+得到最概然分布
+\[
+  a_l=\omega_l e^{-\alpha-\beta\epsilon_l}.
+\]
+这里 $\alpha$ 和 $\beta$ 是拉格朗日乘子：
+\[
+  \alpha\quad\text{对应粒子数约束 } \sum_l a_l=N,
+\qquad
+  \beta\quad\text{对应能量约束 } \sum_l a_l\epsilon_l=E.
+\]
+与热力学量比较后有
+\[
+  \beta=\frac{1}{\kb T},\qquad
+  \alpha=-\beta\mu=-\frac{\mu}{\kb T}.
+\]
+平均每个单粒子态上的占据数是
+\[
+  \bar n_l=\frac{a_l}{\omega_l}
+  =e^{-\beta(\epsilon_l-\mu)},
+\qquad
+  \beta=\frac{1}{\kb T}.
+\]
+
+若第 $l$ 个能级附近相空间体积为 $\Delta\omega_l$，每个相空间量子元体积为 $h_0^r$，则
+\[
+  \omega_l=\frac{\Delta\omega_l}{h_0^r},
+\]
+\[
+  a_l=\frac{\Delta\omega_l}{h_0^r}e^{-\alpha-\beta\epsilon_l}.
+\]
+这就是第 6 章从经典相空间走向 Boltzmann 分布的关键桥梁。
+
+\section{Bose-Einstein 统计分布}
+
+Bose 统计用于全同玻色子。对于第 $l$ 个能级，$\omega_l$ 个量子态中可以放入 $a_l$ 个不可分辨粒子，且每个态可以放多个粒子。单能级的微观态数为
+\[
+  \Omega_l^{\rm BE}
+  =\frac{(\omega_l+a_l-1)!}{a_l!(\omega_l-1)!}.
+\]
+整个系统的微观态数为
+\[
+  \Omega_{\rm BE}
+  =\prod_l
+  \frac{(\omega_l+a_l-1)!}{a_l!(\omega_l-1)!}.
+\]
+最大化 $\ln\Omega_{\rm BE}$，并加入
+\[
+  \sum_l a_l=N,\qquad \sum_l a_l\epsilon_l=E
+\]
+两个约束，变分方程给出
+\[
+  \ln\frac{\omega_l+a_l}{a_l}
+  =\alpha+\beta\epsilon_l.
+\]
+因此 Bose-Einstein 分布的能级占据数为
+\[
+  a_l
+  =
+  \frac{\omega_l}{e^{\alpha+\beta\epsilon_l}-1}
+  =
+  \frac{\omega_l}{e^{\beta(\epsilon_l-\mu)}-1}.
+\]
+平均每个单粒子量子态上的占据数是
+\[
+  \bar n_l
+  =\frac{a_l}{\omega_l}
+  =\frac{1}{e^{\beta(\epsilon_l-\mu)}-1}.
+\]
+分母中的 $-1$ 表示 Bose 增强：某个态里已有粒子时，更多粒子进入该态并不被排斥。
+
+\section{Fermi-Dirac 统计分布}
+
+Fermi 统计用于全同费米子。Pauli 不相容原理要求每个单粒子量子态最多放一个粒子。因此第 $l$ 个能级的占据数必须满足
+\[
+  0\le a_l\le \omega_l.
+\]
+给定 $a_l$ 时，只需要从 $\omega_l$ 个量子态中选出 $a_l$ 个被占据：
+\[
+  \Omega_l^{\rm FD}
+  =\frac{\omega_l!}{a_l!(\omega_l-a_l)!}.
+\]
+整个系统
+\[
+  \Omega_{\rm FD}
+  =\prod_l
+  \frac{\omega_l!}{a_l!(\omega_l-a_l)!}.
+\]
+最大化 $\ln\Omega_{\rm FD}$，并加入粒子数和能量约束，变分方程给出
+\[
+  \ln\frac{\omega_l-a_l}{a_l}
+  =\alpha+\beta\epsilon_l.
+\]
+因此 Fermi-Dirac 分布的能级占据数为
+\[
+  a_l
+  =
+  \frac{\omega_l}{e^{\alpha+\beta\epsilon_l}+1}
+  =
+  \frac{\omega_l}{e^{\beta(\epsilon_l-\mu)}+1}.
+\]
+平均每个单粒子量子态上的占据数是
+\[
+  \bar n_l
+  =\frac{a_l}{\omega_l}
+  =\frac{1}{e^{\beta(\epsilon_l-\mu)}+1}.
+\]
+分母中的 $+1$ 来自 Pauli 排斥：一个态已经被占据，就不能再放同种费米子。
+
+\section{三种分布的统一写法和经典极限}
+
+三种平均占据数可写为
+\[
+  \bar n_l
+  =
+  \frac{1}{e^{\beta(\epsilon_l-\mu)}+\eta},
+\qquad
+  \eta=
+  \begin{cases}
+    0, & \text{Boltzmann},\\
+    -1, & \text{Bose},\\
+    +1, & \text{Fermi}.
+  \end{cases}
+\]
+当每个单粒子态平均占据很小，
+\[
+  \bar n_l\ll 1
+  \quad\Longleftrightarrow\quad
+  e^{\beta(\epsilon_l-\mu)}\gg 1,
+\]
+分母中的 $\eta$ 可以忽略，于是 Bose 和 Fermi 都退化成 Boltzmann：
+\[
+  \bar n_l\simeq e^{-\beta(\epsilon_l-\mu)}.
+\]
+宏观上常用简并参数判断经典近似：
+\[
+  n\lambda_T^3\ll 1,\qquad
+  \lambda_T=\frac{h}{\sqrt{2\pi m\kb T}}.
+\]
+
+\begin{keybox}
+\textbf{一页记忆：}Boltzmann 是经典稀薄极限，Bose 是可多重占据，Fermi 是每态最多一个。分布公式来自微观态计数，而不是反过来凭经验写出。
+\end{keybox}
