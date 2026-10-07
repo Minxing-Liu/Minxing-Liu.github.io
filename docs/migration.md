@@ -18,4 +18,6 @@ quant-intern-strategy 和 chapter-4-information-theory 上传文件正文为空�
 
 ## 发布边界
 
-本分支与 PR 只构建和提供预览。main 合并后仍需将仓库 Pages Source 设为 GitHub Actions；之后 main 上的 push 会构建并发布。master 旧版快照保持不变，可作为回退起点。
+2026-10-07，PR #2 已合并至 main，正式站点 https://minxing-liu.github.io/ 已切换为 Butterfly。GitHub Actions 运行 37561582300 的 build 与 deploy 均成功，正式首页及背景图片已核验。
+
+今后在 main 维护源码；每次 push 会触发构建和 GitHub Pages 发布。master 旧版快照保持不变，可作为回退起点。操作步骤见仓库 README。
