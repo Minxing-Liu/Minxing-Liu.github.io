@@ -13,6 +13,7 @@ comments: false
 
 ## 研究笔记
 
+- [稀疏与扩张：模型、重叠与分类信噪比](/notes/sparseness-expansion-sensory-representations/)：推导随机与结构化连接的簇内距离、重叠方差及 Hebbian 读出信噪比。
 - [KC–KC 递归连接：模型推导与逻辑核查](/notes/kc-recurrent-connectivity/)：高斯阈值基准、递归近似、读出任务与谱推导的适用条件，附独立数学检查。
 - [最优突触连接数：模型与公式推导](/notes/optimal-degrees-synaptic-connectivity/)：按原文顺序整理表征维度、资源约束、空间连接、Hebbian 分类及输入连接学习。
 - [Similarity Matching 与嗅觉预处理](/notes/similarity-matching/)：从相似性匹配目标到局部学习规则，理解嗅觉回路中的去相关与谱变换。
