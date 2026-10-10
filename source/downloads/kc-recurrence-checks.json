@@ -1,0 +1,87 @@
+{
+  "scope": "Independent selected mathematical checks; no connectome reproduction",
+  "numpy": "2.3.5",
+  "scipy": "1.17.0",
+  "checks_passed": 17,
+  "results": {
+    "hypergeometric_overlap_moments": {
+      "passed": true,
+      "maximum_absolute_error": 2.220446049250313e-16
+    },
+    "conditional_and_arcsine_gaussian_integrals": {
+      "passed": true,
+      "maximum_absolute_error": 1.3877787807814457e-17
+    },
+    "first_threshold_kernel_derivative": {
+      "passed": true,
+      "maximum_absolute_error": 2.11820144757624e-13
+    },
+    "APL_rank_one_inverse": {
+      "passed": true,
+      "maximum_absolute_error": 4.440892098500626e-16
+    },
+    "APL_overlap_correlation_balanced_finite_network": {
+      "passed": true,
+      "maximum_absolute_error": 3.608224830031759e-16
+    },
+    "binary_participation_pair_identity": {
+      "passed": true,
+      "maximum_absolute_error": 1.7763568394002505e-15
+    },
+    "APL_current_dimension_with_cross_blocks": {
+      "passed": true,
+      "maximum_absolute_error": 2.220446049250313e-15
+    },
+    "APL_nonmonotonic_dimension_counterexample": {
+      "passed": true,
+      "maximum_absolute_error": 2.220446049250313e-15
+    },
+    "APL_counterexample_values": {
+      "feedforward": 4.0,
+      "optimal_finite_inhibition": 5.000000000000001,
+      "infinite_inhibition_limit": 3.999999999999998
+    },
+    "structured_overlap_degree": {
+      "passed": true,
+      "maximum_absolute_error": 0.0
+    },
+    "structured_B3_residual_dimension_unchanged_example": {
+      "passed": true,
+      "maximum_absolute_error": 4.440892098500626e-16
+    },
+    "aligned_spectrum_sign_counterexample": {
+      "passed": true,
+      "initial": 1.4705882352941178,
+      "inhibitory": 1.6958103508977815,
+      "excitatory": 1.2195121951219512
+    },
+    "semicircle_resolvent_moments": {
+      "passed": true,
+      "maximum_absolute_error": 4.440892098500626e-16
+    },
+    "resolvent_moment_ratio": {
+      "passed": true,
+      "maximum_absolute_error": 6.661338147750939e-16
+    },
+    "exact_Hebbian_margin_moments": {
+      "passed": true,
+      "maximum_absolute_error": 5.551115123125783e-17
+    },
+    "interaction_proxy_optimum_c_0.4": {
+      "passed": true,
+      "maximum_absolute_error": 3.854710957172658e-06
+    },
+    "interaction_proxy_optimum_c_0.8": {
+      "passed": true,
+      "maximum_absolute_error": 4.925754709658725e-06
+    },
+    "interaction_proxy_optima": {
+      "0.4": 0.03530385471095717,
+      "0.8": 0.01942507424529034
+    },
+    "Student_truncated_first_moment_coefficient": {
+      "passed": true,
+      "maximum_absolute_error": 2.7755575615628914e-17
+    }
+  }
+}
