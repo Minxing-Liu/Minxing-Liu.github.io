@@ -13,7 +13,9 @@ comments: false
 
 ## 研究笔记
 
-- [最优突触连接数：模型与公式推导](/notes/optimal-degrees-synaptic-connectivity/)：Litwin-Kumar 等（2017）的表征维度、全局抑制、突触资源约束与 Hebbian 分类性能。
+- [Kenyon Cell连接模式科研背景梳理](/notes/kenyon-cell-connectivity-background/)：依据公开论文梳理 KC 局部调制、mAChR-B 学习门控与 APL 反馈。
+- [稀疏与扩张：模型、重叠与分类信噪比](/notes/sparseness-expansion-sensory-representations/)：推导随机与结构化连接的簇内距离、重叠方差及 Hebbian 读出信噪比。
+- [最优突触连接数：模型与公式推导](/notes/optimal-degrees-synaptic-connectivity/)：按原文顺序整理表征维度、资源约束、空间连接、Hebbian 分类及输入连接学习。
 - [Similarity Matching 与嗅觉预处理](/notes/similarity-matching/)：从相似性匹配目标到局部学习规则，理解嗅觉回路中的去相关与谱变换。
 - [自适应预处理网络：模型与推导](/notes/adaptive-preprocessing/)：从目标函数、网络动力学到权重更新，逐步梳理自适应预处理模型。
 - [自适应 K 与非负约束网络](/notes/adaptive-k-nnc/)：整理自适应维数和非负约束网络的研究记录与结果。
