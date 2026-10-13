@@ -3,7 +3,7 @@ title: Kenyon Cell连接模式科研背景梳理
 date: '2026-10-12'
 updated: '2026-10-13'
 permalink: notes/kenyon-cell-connectivity-background/
-description: 从 LK17 的前馈与递归抑制模型出发，明确 KC 局部连接、APL 动力学、线性响应、表征维度、噪声和学习读出的方程与比较条件。
+description: 从全局 APL 与局部轴突抑制出发，逐步加入树突兴奋、活动门控、分区反馈与连接可塑性，推导动力学、协方差和任务指标。
 categories:
 - 研究笔记
 tags:
@@ -16,9 +16,9 @@ comments: false
 disableNunjucks: true
 ---
 
-果蝇蘑菇体通过 Kenyon 细胞（KC）的稀疏活动表征气味。PN–KC 前馈连接决定感觉输入如何进入这一表征，KC 轴突之间的局部调制和 APL 反馈则参与活动调节与学习。本文依据公开论文，梳理这些连接的位置、受体机制及其对气味表征和联想学习的影响。
+果蝇蘑菇体的 PN–KC 前馈连接决定感觉输入如何进入扩张层。局部 KC 连接和 APL 反馈进一步改变活动的空间分布、时间过程与学习更新。本文先梳理生理背景，再从全局 APL 与固定轴突抑制出发，逐步加入树突兴奋、活动门控、分区反馈和连接可塑性。每一步都给出方程变化及对应的分析指标。
 
-第 1–3 节整理生物学背景，第 4 节从 LK17 原始方程进入递归扩展，第 5–7 节给出动力学、线性响应和评价指标，第 8–9 节说明状态门控与数值比较。新增的连续动力学和学习规则均注明建模假设，不作为 LK17 原文或生理实验已经确定的方程。
+模型中的低通滤波、受体门控和学习更新采用明确的现象学假设。它们用于建立可检验模型，参数与效应方向需要通过模拟及数据比较确定。
 
 <!-- more -->
 
@@ -85,429 +85,480 @@ Chen 等（2026）发现，在其实验条件下，急性睡眠剥夺损害相�
 
 这表明，稀疏度和抑制增益并非始终固定的生物量。建模时应区分两种比较：固定稀疏度，用于识别连接结构本身的作用；允许稀疏度随状态变化，用于模拟生理状态改变的总体效应。这项工作并未直接证明表征维度或 $K^\star$ 随睡眠按某个方向变化。
 
-## 4. 从 LK17 的原始方程到连接矩阵扩展
+## 4. 统一记号与最小模型
 
-### 4.1 统一记号与前馈模型
+设网络包含$M$ 个 PN、$N$ 个 KC，每个 KC 的 PN 入度为 $K$。输入为 $\mathbf x\in\mathbb R^M$，KC 发放率为 $\mathbf y\in\mathbb R^N$，PN–KC 矩阵为 $W\in\mathbb R^{N\times M}$。
 
-下面用 $N$ 表示 PN 数，$M$ 表示 KC 数。$J_{ik}$ 表示 PN $k$ 到 KC $i$ 的权重，递归矩阵 $R_{ij}$ 表示 KC $j$ 对 KC $i$ 的作用，即**列为发送端，行为接收端**。
-
-| 记号 | 定义 |
-|---|---|
-| $\mathbf x\in\mathbb R^N$ | PN 输入 |
-| $\mathbf m\in\{0,1\}^M$ | 二值 KC 活动 |
-| $K$ | 每个 KC 接收的 PN 兴奋性连接数 |
-| $\boldsymbol\theta$ | KC 阈值 |
-| $g_A,g_B,g_E\ge0$ | APL、局部负耦合和局部正耦合的强度 |
-| $\mathbf u,\mathbf r$ | 连续模型的有效输入和连续活动 |
-
-定义连接指示矩阵 $A_{ik}\in\{0,1\}$，满足 $\sum_k A_{ik}=K$。为与 LK17 补充图 S2 的归一化一致，以下取 $J^+_{ik}=A_{ik}/\sqrt K$。这是权重标度的选择；更改标度时，阈值和抑制强度也须相应调整。
-
-LK17 的前馈模型可写成
+统一约定 $R_{ij}$ 表示 **KC $j$ 向 KC $i$ 的作用**，即行是接收者、列是发送者。阈值记为 $\mathbf b$，避免与轴突抑制标记 $(b)$ 混淆。阈值线性函数取
 
 $$
-h_i^{\mathrm{ff}}=\sum_{k=1}^N J^+_{ik}x_k-a\sum_{k=1}^N x_k,
-\qquad
-m_i=\Theta(h_i^{\mathrm{ff}}-\theta_i).
+\phi(h)=\gamma[h]_+,\qquad [h]_+=\max(h,0),\qquad \gamma>0.
 \tag{1}
 $$
 
-负项由 **PN 输入**驱动，可以吸收到有效输入矩阵 $J_{ik}=J^+_{ik}-a$ 中。于是原始映射仍是 $\mathbf m=\Theta(J\mathbf x-\boldsymbol\theta)$，不需要求解 KC 活动的自洽方程。
-
-### 4.2 LK17 已有的递归抑制模型
-
-LK17 补充图 S2 将前馈抑制替换为 KC 群体活动驱动的反馈 [1]。将原文的 $w^-$ 记作 $g_A$，被选中神经元的更新为
+无递归作用时，$\mathbf y=\phi(W\mathbf x-\mathbf b)$。首先加入全局 APL 与固定轴突抑制
 
 $$
-m_i^{(n+1)}=
-\Theta\!\left[
-\sum_kJ^+_{ik}x_k-
-\frac{g_A}{M}\sum_jm_j^{(n)}-\theta_i
-\right].
+\tau_K\dot{\mathbf y}
+=-\mathbf y+\phi\!\left(W\mathbf x+R^{(1)}\mathbf y-\mathbf b\right),
+\qquad
+R^{(1)}=-g_A P-g_b B,
+\qquad P=\frac{\mathbf1\mathbf1^\top}{N}.
 \tag{2}
 $$
 
-原文每一步随机选择一个 KC 更新，其他 KC 保持原值；$n$ 是更新次数，不是已经标定的生理时间。原文固定 $\theta_i=0$、改变抑制强度以获得不同活动水平，再与活动水平匹配的前馈网络比较。
+$P$ 是全局平均反馈的秩一投影；$B\ge0$ 表示轴突邻近 KC 的有效连接强度，通常不含自连接；$g_A,g_b\ge0$。因此 $R^{(b)}=-g_bB$。这一步的变化是输入电流依赖网络自身活动，输出由一次前馈计算变为自洽固定点。
 
-令 $\Pi=\mathbf1\mathbf1^\top/M$，则这一反馈的有效矩阵是
+### 4.1 从连接组计数到有效权重
 
-$$
-R_A=-g_A\Pi.
-$$
-
-与式（1）的差别是，抑制由输出 $\mathbf m$ 决定。固定点必须满足
+连接组提供拓扑和突触数，并不直接提供每条连接的受体类型或有效电流。一个可明确复现的转换为
 
 $$
-\mathbf m^*=\Theta(J^+\mathbf x+R_A\mathbf m^*-\boldsymbol\theta).
+B_{ij}=\frac{n^{\mathrm{axon}}_{j\to i}
+\,\mathbb I[n^{\mathrm{axon}}_{j\to i}\ge n_{\min}]
+\,q_i^{B}}{Z_b},\qquad B_{ii}=0.
 \tag{3}
 $$
 
-因此，“增加反馈”首先改变的是输入和输出之间的依赖关系：KC 输出成为下一次 KC 更新的输入。
+$q_i^B$ 表示接收 KC 的受体证据或假设权重。若同时限制两端细胞亚型，可另乘发送者掩膜；该限制不能等同于每个突触的受体身份已被直接测得。$Z_b$ 必须记录为固定归一化规则，不能在扫参时无说明地改变。
 
-### 4.3 从均匀反馈到局部连接
+采用 $1/\sqrt{K_b}$ 的简化标度时，可取二值邻接 $B_{ij}=A^{(b)}_{ij}/\sqrt{K_b}$，其中 $K_b$ 是 KC–KC 轴突入度。它与 PN 入度 $K$ 不同。计数加权、二值加权、固定行和是不同模型选择，应分别报告。
 
-引入非负矩阵 $E,B$，分别表示候选正耦合和有效负耦合的空间权重，令 $E_{ii}=B_{ii}=0$。一种明确的静态扩展是
+## 5. 区分快速 APL 与慢速轴突抑制
+
+式（2）只含 KC 时间常数。要区分快速全局反馈与慢速局部抑制，需要增加慢通道状态变量。
+
+用 $\mathbf z_b$ 表示经慢速通道滤波后的 KC 活动；APL 先取快反馈极限：
 
 $$
-R=g_EE-g_BB-g_A\Pi,
-\qquad
-m_i^{(n+1)}=\Theta\!\left[
-(J^+\mathbf x)_i+\sum_jR_{ij}m_j^{(n)}-\theta_i
-\right].
+\begin{aligned}
+\tau_K\dot{\mathbf y}
+&=-\mathbf y+
+\phi(W\mathbf x-g_A P\mathbf y-g_bB\mathbf z_b-\mathbf b),\\
+\tau_b\dot{\mathbf z}_b&=-\mathbf z_b+\mathbf y.
+\end{aligned}
 \tag{4}
 $$
 
-这里仍可采用式（2）的异步更新。若改成所有神经元同步更新，就改变了动力学规则，必须重新检查振荡和收敛。
+扫参时可先取 $\tau_b\sim300\,\mathrm{ms}$ 作为慢通道示例，再根据响应时间过程拟合。在固定点，$\mathbf z_b^*=\mathbf y^*$，式（4）恢复式（2）。在瞬态中，输入起始时局部慢抑制尚未积累；后期才接近固定点。因而应同时比较起始响应、稳态响应和整段气味刺激中的判别表现。
 
-| 加入的连接 | 方程新增项 | 被改变的依赖关系 |
-|---|---|---|
-| 全局 APL | $-g_A\sum_jm_j/M$ | 每个 KC 受群体平均活动影响 |
-| 局部有效负耦合 | $-g_B\sum_jB_{ij}m_j$ | KC 受特定邻近或相连 KC 的活动影响 |
-| 局部候选正耦合 | $+g_E\sum_jE_{ij}m_j$ | 相连 KC 的活动可增强接收细胞的输入 |
-
-Eichler 等（2017）的幼虫连接组研究已在公开模型中纳入 KC–KC 连接及 APL 反馈，并区分树突与轴突连接 [6]。这一研究提供结构建模的先例，但幼虫连接不能直接等同于成蝇中的受体机制。尤其是，将 $E$ 设为正耦合属于明确的模型假设，不能只凭 EM 突触数确定功能符号。
-
-若 $C_{ij}$ 是某类连接的突触数，可以采用 $B=C/s_B$，其中 $s_B>0$ 是预先指定的归一化尺度，$g_B$ 单独控制整体强度。比较真实结构与随机对照时，应匹配所关心的连接数、总权重或度分布，并说明保留了哪些量。
-
-同样，不能默认 KC 共享的 PN 越多，KC–KC 连接就越强。Eichler 等的幼虫数据没有检出这两者的相关性 [6]；若采用此关系，只能将其列作额外的对照假设。
-
-本节中的 $-g_BB\mathbf m$ 是对局部净作用的现象学近似。mAChR-B 对钙信号、cAMP 和可塑性的调制并不自动等价于对放电的固定负权重，状态门控需要另行描述，见第 8 节。
-
-## 5. 连续动力学及 APL 的显式时间尺度
-
-### 5.1 给 KC 和 APL 各自引入状态变量
-
-二值更新给出了算法，但尚未指定膜或突触的时间常数。为了分析连续时间响应，可以另外构造
+设 $\Gamma=\operatorname{diag}\phi'(\mathbf h^*)$，其中 $\mathbf h^*$ 为阈值前电流。在不跨越阈值的工作点，线性化为
 
 $$
-\begin{aligned}
-\tau_K\dot{\mathbf u}
-&=-\mathbf u+J^+\mathbf x
-+(g_EE-g_BB)\mathbf r-g_AU\mathbf a,\\
-\mathbf r&=\phi(\mathbf u-\boldsymbol\theta),\\
-\tau_A\dot{\mathbf a}&=-\mathbf a+V\mathbf r.
-\end{aligned}
+\frac{d}{dt}
+\begin{pmatrix}\delta\mathbf y\\\delta\mathbf z_b\end{pmatrix}
+=\mathcal A_1
+\begin{pmatrix}\delta\mathbf y\\\delta\mathbf z_b\end{pmatrix},
+\quad
+\mathcal A_1=
+\begin{pmatrix}
+(-I-g_A\Gamma P)/\tau_K&-g_b\Gamma B/\tau_K\\
+I/\tau_b&-I/\tau_b
+\end{pmatrix}.
 \tag{5}
 $$
 
-$\mathbf u$ 是有效输入变量，$\mathbf r$ 是连续活动。$\phi$ 可以取平滑 sigmoid，或在可微工作区使用阈值线性函数。该连续模型是新增的分析模型，不是式（2）的严格连续时间等价形式。
-
-$\mathbf a\in\mathbb R^L$ 表示 APL 的 $L$ 个有效区室，$V\in\mathbb R^{L\times M}$ 描述 KC 对这些区室的驱动，$U\in\mathbb R^{M\times L}$ 描述区室对 KC 的抑制。$L$ 个变量并不表示 $L$ 个 APL 神经元。
-
-全局均匀反馈对应 $L=1$、$U=\mathbf1$、$V=\mathbf1^\top/M$。局部反馈允许 $U,V$ 非均匀；它们是对 APL 空间作用 [4] 的简化，区室之间是否独立仍是需要说明的假设。
-
-当 APL 比被研究的 KC 变化过程足够快，或只计算稳态时，可以代入 $\mathbf a\approx V\mathbf r$，得到
+局部线性稳定性要求 $\max\operatorname{Re}\lambda(\mathcal A_1)<0$。不能只检查静态逆矩阵是否存在。频率响应进一步为
 
 $$
-\tau_K\dot{\mathbf u}
-=-\mathbf u+J^+\mathbf x+R\mathbf r,
-\qquad
-R=g_EE-g_BB-g_AUV.
+H_y(\omega)=
+\left[(1+i\omega\tau_K)I+g_A\Gamma P
++\frac{g_b\Gamma B}{1+i\omega\tau_b}\right]^{-1}\Gamma W.
 \tag{6}
 $$
 
-$UV$ 的秩至多为 $L$。只有特定的 $U,V$ 才给出投影矩阵；一般的空间反馈矩阵不能直接称为“秩 $L$ 投影”。当 $\tau_A$ 不可忽略时，应保留式（5），不能用静态消元研究反馈延迟造成的振荡。
+这清楚展示慢速抑制在高频刺激下减弱并产生相位延迟。核心模型的时间分析可直接由 $H_y(\omega)$ 与时域模拟比较，不必先引入脉冲模型。
 
-### 5.2 固定点、可逆性与稳定性
+## 6. 解析对象：固定点、协方差与维度
 
-式（6）的固定点满足
+### 6.1 有效输入映射的适用范围
+
+有效映射 $(I-R)^{-1}W$ 只在线性工作区间适用。阈值函数与矩阵逆不能普遍交换。
+
+固定活跃集合为 $\mathcal S$，其余 KC 的发放率为零，则
 
 $$
-\mathbf u^*=J^+\mathbf x+R\mathbf r^*,
-\qquad
-\mathbf r^*=\phi(\mathbf u^*-\boldsymbol\theta).
+\mathbf y_{\mathcal S}^*
+=\gamma(I-\gamma R_{\mathcal S\mathcal S})^{-1}
+(W_{\mathcal S}\mathbf x-\mathbf b_{\mathcal S}).
 \tag{7}
 $$
 
-由于 $\phi$ 非线性，一般不能把它改写成 $\phi((I-R)^{-1}J^+\mathbf x-\boldsymbol\theta)$。解析响应应从固定点附近的小扰动出发。
+该解还必须满足活跃 KC 的阈值前电流为正、其余 KC 的电流非正。输入改变活跃集合后，需要重新求解，不能继续使用同一个全局线性映射。
 
-令 $\Gamma=\operatorname{diag}(\phi'(u_i^*-\theta_i))$。对快 APL 模型，局部动力学矩阵为
+对固定工作点的小扰动，令 $\delta\mathbf y=\Gamma\delta\mathbf h$，有
 
 $$
-A_K=\frac{-I+R\Gamma}{\tau_K}.
+\delta\mathbf h=W\delta\mathbf x+R\Gamma\delta\mathbf h,
+\qquad
+H_h=(I-R\Gamma)^{-1}W,
+\qquad H_y=\Gamma H_h.
 \tag{8}
 $$
 
-线性化系统渐近稳定当且仅当 $A_K$ 所有特征值实部严格小于零，即 $\max\operatorname{Re}\lambda(R\Gamma)<1$；这也给出原非线性系统局部渐近稳定的充分判据。特征值实部等于零的边界需要进一步分析。矩阵 $I-R\Gamma$ 可逆只说明零频线性方程能求解，不足以保证稳定。
-
-若使用平滑的同步迭代 $\mathbf r^{(n+1)}=\phi(J^+\mathbf x+R\mathbf r^{(n)}-\boldsymbol\theta)$，其线性化迭代收敛条件则是 $\rho(\Gamma R)<1$，这也是原平滑迭代的充分局部收敛条件。这个条件不能不加说明地用于二值异步更新。
-
-对保留 APL 时间常数的式（5），令 $R_0=g_EE-g_BB$，应检查完整矩阵
+所以局部输入电流和输出协方差分别为
 
 $$
-A_{\mathrm{full}}=
-\begin{pmatrix}
-(-I+R_0\Gamma)/\tau_K & -g_AU/\tau_K\\
-V\Gamma/\tau_A & -I/\tau_A
-\end{pmatrix}.
+C^h=H_h\Sigma_xH_h^\top,
+\qquad C^y=H_y\Sigma_xH_y^\top.
 \tag{9}
 $$
 
-这也明确了加入连接后动力学分析的变化：不仅要看稳态活动，还要看收敛速度、振荡、多稳态和对初始条件的依赖。
+这里 $\Sigma_x$ 是所分析输入扰动的协方差。若使用跨气味的大幅变化，必须检查活跃集合是否频繁改变。下面的高斯电流近似使用 $\Gamma\approx\gamma I$，其适用范围需要与数值模型比较。
 
-## 6. 从连接变化到协方差和维度
+### 6.2 APL 的秩一部分与局部抑制一起处理
 
-### 6.1 固定工作点附近的有效输入映射
-
-固定阈值和权重，在式（7）附近施加小输入扰动 $\delta\mathbf x$，有
+在标量增益近似下，设 $\mathbf u=\mathbf1/\sqrt N$，$L=I+\gamma g_bB$。核心模型的电流响应矩阵为
 
 $$
-\delta\mathbf u=J^+\delta\mathbf x+R\delta\mathbf r,
-\qquad
-\delta\mathbf r=\Gamma\delta\mathbf u.
-$$
-
-代入并移项得到
-
-$$
-\begin{aligned}
-H_u&=(I-R\Gamma)^{-1}J^+,\\
-H_r&=\Gamma(I-R\Gamma)^{-1}J^+
-=(I-\Gamma R)^{-1}\Gamma J^+,\\
-\delta\mathbf u&=H_u\delta\mathbf x,
-\qquad \delta\mathbf r=H_r\delta\mathbf x.
-\end{aligned}
+G_1=(I+\gamma g_bB+\gamma g_A\mathbf u\mathbf u^\top)^{-1}
+=L^{-1}
+-\frac{\gamma g_A L^{-1}\mathbf u\mathbf u^\top L^{-1}}
+{1+\gamma g_A\mathbf u^\top L^{-1}\mathbf u}.
 \tag{10}
 $$
 
-因此，增加连接后，原来的输入映射 $J^+$ 被网络反馈和局部增益共同变换。$R$ 与 $\Gamma$ 一般不能交换顺序；当 $\Gamma=\gamma I$ 时才简化为标量增益形式。
+这是同时保留 $B$ 的 Sherman–Morrison 处理，要求 $L$ 可逆且分母非零。仅有 APL 时，$G_1=I-\gamma g_A P/(1+\gamma g_A)$，均匀方向被压低，正交方向保持不变。
 
-若 $\Sigma_x=\operatorname{Cov}(\delta\mathbf x)$，则
+当 $B$ 不是均匀行列和矩阵时，APL 与残余子空间不再严格解耦。用式（14）检验均匀与残余通道的分离程度，不能预先假定两者独立。
+
+### 6.3 从高斯电流代理到二值参与率
+
+二值维度可先用“线性高斯电流＋阈值”代理计算。它与式（4）的阈值线性发放率模型不同，也不自动等于非线性递归二值模型。
+
+计算 $C^h=G_1W\Sigma_xW^\top G_1^\top$，令
 
 $$
-C^u=H_u\Sigma_xH_u^\top,
-\qquad
-C^r=H_r\Sigma_xH_r^\top.
+q_{ij}=\frac{C^h_{ij}}{\sqrt{C^h_{ii}C^h_{jj}}},\quad
+t_f=\Phi^{-1}(1-f),\quad
+F_f(q)=\frac{\Pr(Z_1>t_f,Z_2>t_f;q)-f^2}{f(1-f)}.
 \tag{11}
 $$
 
-这是固定工作点附近、由静态输入扰动产生的协方差。若不同气味使活跃细胞和 $\Gamma$ 大幅改变，单个 $H_r$ 无法代表整个气味集合，应直接模拟各气味响应后估计协方差。
-
-### 6.2 全局反馈和局部反馈对不同方向的作用
-
-对 $R=-g_A\Pi$、$\Gamma=\gamma I$，利用 $\Pi^2=\Pi$，
+$0<f<1$，$Z_1,Z_2$ 是相关系数为 $q$ 的标准高斯变量，各通道方差非零。按每通道方差标准化并使用相同编码水平 $f$ 后，二值参与率为
 
 $$
-H_r=\gamma\left(I-\frac{\gamma g_A}{1+\gamma g_A}\Pi\right)J^+.
+D_{\mathrm{bin}}
+=\frac{N^2}{N+\sum_{i\ne j}F_f(q_{ij})^2}.
 \tag{12}
 $$
 
-在这个均匀增益近似中，群体共同方向 $\mathbf1$ 的增益是 $\gamma/(1+\gamma g_A)$，正交方向的增益是 $\gamma$。全局 APL 因而直接压低共同波动；实际阈值变化仍可能间接改变其他方向。
-
-局部负耦合则不一定压低所有方向。以两个 KC 为例，
+直接数值模型则用真实输出 $\mathbf y$ 或真实二值活动计算
 
 $$
-R=\begin{pmatrix}0&-b\\-b&0\end{pmatrix},\qquad b\ge0.
-$$
-
-共同方向 $(1,1)$ 的特征值是 $-b$，差异方向 $(1,-1)$ 的特征值是 $+b$，对应增益分别为
-
-$$
-G_{\mathrm{common}}=\frac{\gamma}{1+\gamma b},
-\qquad
-G_{\mathrm{difference}}=\frac{\gamma}{1-\gamma b}.
+D(C)=\frac{(\operatorname{tr}C)^2}{\operatorname{tr}(C^2)}.
 \tag{13}
 $$
 
-局部竞争可以压低共同响应、增强差异响应；当 $\gamma b$ 接近 $1$ 时，差异方向也接近失稳。这个例子说明，不能从“连接元素均为负”直接推出“所有模式都被抑制”或“网络始终稳定”。
+首先比较有限矩阵代理、阈值线性模型和递归二值模型的 $D(K,g_A,g_b)$，标出近似误差、稳定边界与编码水平。不能把代理式的精确数值计算称为对整个非线性网络的精确理论。
 
-### 6.3 参与率维度及二值阈值变换
+### 6.4 通道分解与最优入度
 
-对实际评价的响应向量 $\mathbf y$，定义
+设 $Q=I-P$。对输出协方差，记录均匀方向功率、残余功率与两者耦合：
 
 $$
-D(\mathbf y)=\frac{(\operatorname{tr}C)^2}{\operatorname{tr}(C^2)},
-\qquad C=\operatorname{Cov}(\mathbf y).
+S_{\parallel}=\mathbf u^\top C\mathbf u,
+\quad S_{\perp}=\operatorname{tr}(QCQ),
+\quad S_{\mathrm{mix}}=\|PCQ\|_F.
 \tag{14}
 $$
 
-当 $C\ne0$ 时，$1\le D\le\operatorname{rank}C$。对式（11）的静态线性响应，秩不超过输入维数；阈值非线性后的输出维度则可以超过输入维数。电流维度、连续活动维度与二值输出维度应分别标记。
+对不同机制分别消融并比较这三个量及协方差谱。$S_{\mathrm{mix}}$ 不小时，应放弃严格均匀／残余独立近似。
 
-若使用**联合高斯电流经过阈值**的近似，并给每个细胞设置相同激活概率 $0<f<1$，对电流方差非零的细胞令
-
-$$
-q_{ij}=\frac{C^u_{ij}}{\sqrt{C^u_{ii}C^u_{jj}}},
-\qquad z_f=\Phi^{-1}(1-f),
-\qquad \theta_i=\bar u_i+z_f\sqrt{C^u_{ii}}.
-$$
-
-对 $|q|<1$，二值输出的相关系数由高斯阈值核给出：
+固定 $g_A,g_b$、归一化和编码条件后，定义
 
 $$
-F_f(q)=\frac{
-\displaystyle\int_{z_f}^{\infty}\varphi(z)
-\overline\Phi\!\left(\frac{z_f-qz}{\sqrt{1-q^2}}\right)\,\mathrm dz-f^2
-}{f(1-f)},
+K_D^*(g_A,g_b)=\arg\max_K D(K,g_A,g_b).
 \tag{15}
 $$
 
-其中 $\varphi,\Phi$ 为标准正态密度与分布函数，$\overline\Phi=1-\Phi$；$q=\pm1$ 时使用对应极限。此时 $C^m_{ii}=f(1-f)$、$C^m_{ij}=f(1-f)F_f(q_{ij})$，代入式（14）得到
+通过扫参测量加入 mAChR-B 后 $K_D^*$ 的移动方向与幅度。所有元素非正的 $R^{(b)}$ 也可能放大某些差异模态，因而不自动保证白化、维度提高或 $K_D^*$ 上移。$K\approx6$ 是特定 LK17 参数下的参照值，不是所有输入统计和预算下的固定常数。
 
-$$
-D_{\mathrm{bin}}=
-\frac{M^2}{M+\sum_{i\ne j}F_f(q_{ij})^2}.
-\tag{16}
-$$
+## 7. 扩展一：树突兴奋与输入空间结构
 
-该式在所定义的高斯阈值模型内成立，但非线性递归网络的稳态电流不一定高斯。尤其是更改阈值会改变递归活动和工作点，不能只做一次阈值后处理，就把结果称为原递归网络的精确维度。可先用该表达式作近似，再与完整网络的样本协方差比较。
+### 7.1 新增连接及其动力学
 
-## 7. 表征之外的分析指标
+加入 $R^{(a)}=g_aE\ge0$，连接限定在萼部空间、细胞亚型与谱系相关的支持上。参数 $\rho_a$ 控制连接密度，$g_a$ 控制单连接强度；密度与强度必须分开。
 
-### 7.1 稀疏度与试次噪声
-
-二值模型的群体激活比例为
-
-$$
-f=\mathbb E_{\mu,\xi}\left[\frac1M\sum_i m_i^{\mu,\xi}\right],
-$$
-
-$\mu$ 标记气味，$\xi$ 标记同一气味的重复试次。连续模型中，平均活动 $M^{-1}\sum_i r_i$ 与“超过指定判定阈值的细胞比例”是两个不同指标，不能混称为 $f$。
-
-比较连接结构时，可以调节阈值使二值输出的 $f$ 匹配。比较睡眠或抑制改变的总体效应时，则可以固定阈值并让 $f$ 自然变化。这两种比较需要分别报告。
-
-为区分信号与噪声，对统一选定的响应 $\mathbf y^{\mu,\xi}$ 定义
+为快速树突通道加入 $\mathbf z_a$：
 
 $$
 \begin{aligned}
-\bar{\mathbf y}^{\mu}&=\mathbb E_\xi[\mathbf y^{\mu,\xi}],\\
-C_{\mathrm{signal}}&=\operatorname{Cov}_\mu(\bar{\mathbf y}^{\mu}),\\
-C_{\mathrm{noise}}&=\mathbb E_\mu[
-\operatorname{Cov}_\xi(\mathbf y^{\mu,\xi}\mid\mu)],\\
-C_{\mathrm{total}}&=C_{\mathrm{signal}}+C_{\mathrm{noise}}.
+\tau_K\dot{\mathbf y}
+&=-\mathbf y+\phi(W\mathbf x+g_aE\mathbf z_a
+-g_bB\mathbf z_b-g_AP\mathbf y-\mathbf b),\\
+\tau_a\dot{\mathbf z}_a&=-\mathbf z_a+\mathbf y,\\
+\tau_b\dot{\mathbf z}_b&=-\mathbf z_b+\mathbf y.
 \end{aligned}
+\tag{16}
+$$
+
+可用 $\tau_a\sim5\,\mathrm{ms}$ 作为快速通道的起始尺度，并进行敏感性分析。时间常数与传导延迟不同；显式延迟需要另写 $\mathbf y(t-d_a)$。
+
+固定点上的变化是 $R^{(1)}\to R^{(1)}+g_aE$。小扰动时
+
+$$
+G=G_1+\gamma g_aG_1EG_1+O(g_a^2),
+\qquad
+\delta C^h=\gamma g_a
+\left(G_1EC_1^h+C_1^hE^\top G_1^\top\right)+O(g_a^2).
 \tag{17}
 $$
 
-总维度上升可能来自信号方向增加，也可能来自噪声增加。对于气味 $a,b$ 和固定读出方向 $\mathbf w$，可进一步计算
+式（17）固定标量增益及阈值代理；实际网络的活跃集合变化需另计。兴奋对不同协方差方向的增益取决于 $E$ 与输入协方差的对齐，不能仅凭连接为正判断维度变化。
+
+### 7.2 比较输入空间结构
+
+将 PN–KC 输入分为三组：M0 全局随机、M1 空间约束随机、M2 实测连接。保持可比较的 PN 入度、输入统计、权重归一化和资源条件，分别计算
 
 $$
-d'_{a,b}=\frac{|\mathbf w^\top(\bar{\mathbf y}^a-\bar{\mathbf y}^b)|}
-{\sqrt{\tfrac12\mathbf w^\top(C_a^{\mathrm{noise}}+C_b^{\mathrm{noise}})\mathbf w}}.
+\Delta D_a^{(m)}=D(W^{(m)},R^{(1)}+g_aE)-D(W^{(m)},R^{(1)}),
+\quad m\in\{0,1,2\}.
 \tag{18}
 $$
 
-分母非零时，该量同时考虑气味间差异与读出方向上的试次噪声。连接放大某个方向后，必须检查该方向的信号和噪声是否一起被放大。
+同时计算任务判别变化 $\Delta\epsilon_a^{(m)}$ 和信噪比。维度降低也可能伴随任务信号增强，二者不能互相替代。
 
-若研究的是持续的时间噪声，应对线性化状态 $\mathbf z=(\delta\mathbf u,\delta\mathbf a)$ 写出随机动力学
+树突连接的效应取决于输入空间结构。分别测量三组的 $\Delta D_a^{(m)}$ 与任务误差，不预设维度变化的符号。
+
+## 8. 扩展二：接收者状态门控与学习特异性
+
+### 8.1 下标与门控位置
+
+mAChR-B 位于接收端。按 $R_{ij}$ 表示 $j\to i$ 的约定，门控应依赖接收者 $i$ 的状态，并作用在矩阵的行上。
+
+用接收者膜电位代理 $v_i$ 控制受体状态 $s_i$，取
 
 $$
-\mathrm d\mathbf z=A_{\mathrm{full}}\mathbf z\,\mathrm dt+L_\eta\,\mathrm d\mathbf W_t.
-$$
-
-在稳定条件下，其平稳协方差 $P_z$ 满足
-
-$$
-A_{\mathrm{full}}P_z+P_zA_{\mathrm{full}}^\top+L_\eta L_\eta^\top=0.
+\tau_s\dot s_i=-s_i+s_\infty(v_i),
+\qquad
+s_\infty(v)=\frac{1}{1+\exp[(v-v_{1/2})/\Delta v]},
+\quad \Delta v>0.
 \tag{19}
 $$
 
-这里 $\mathbf W_t$ 是标准 Wiener 过程，$L_\eta$ 给出白噪声强度。式（19）描述时间噪声，式（11）描述静态输入样本的传播，二者对应不同问题。
+阈下时 $s_i$ 大，去极化时 $s_i$ 小。$s_i$ 高表示受体抑制作用强；它不是“学习许可大”。发放率 $y_i$ 在阈下恒为零，无法分辨不同阈下电位，因此优先用电位变量。若用 $v_i=v_0+c_y y_i$，应注明是简化代理，不能直接解释为真实膜电位。
 
-### 7.2 保持 LK17 的读出规则，比较新增连接的效果
-
-将网络对训练气味的响应记为 $\mathbf y^\mu$，随机二分类标签为 $\ell^\mu\in\{-1,+1\}$。中心化后采用 Hebbian 读出：
+定义 $S=\operatorname{diag}(s_i)$，将式（16）的轴突项改为
 
 $$
-\mathbf w=\sum_{\mu=1}^{P}\ell^\mu(\mathbf y^\mu-\bar{\mathbf y}),
-\qquad
-s=\mathbf w^\top(\widetilde{\mathbf y}-\bar{\mathbf y}),
-\qquad
-\widehat\ell=\operatorname{sign}s.
+-g_bB\mathbf z_b\quad\longrightarrow\quad-g_bSB\mathbf z_b,
+\qquad R^{(b)}_{ij}(v_i)=-g_bs_i(v_i)B_{ij}.
 \tag{20}
 $$
 
-$\bar{\mathbf y}$ 由训练或独立校准数据确定；二值且各细胞激活概率都为 $f$ 时，可用 $f\mathbf1$。训练和测试样本必须分别经过各自的完整网络动力学，不能只给训练表征加上一个矩阵变换。
+式（20）保留连接支持 $B$，只改变接收端增益。
 
-令正确标签乘以测试分数为 $q=\ell s$，则报告
+若以 $s_i=s_\infty(v_0+c_y y_i)$ 作瞬时代理，慢通道固定点处的递归电流导数为
 
 $$
-\epsilon=\Pr(\widehat\ell\ne\ell),
-\qquad
-\mathrm{SNR}=\frac{\mathbb E[q]^2}{\operatorname{Var}(q)}.
+J_{b,\mathrm{eff}}
+=-g_b\left[SB+\operatorname{diag}
+\left(c_y s_\infty'(v_i)(B\mathbf y)_i\right)\right].
 \tag{21}
 $$
 
-只有当 $\mathbb E[q]>0$ 且 $q$ 近似高斯时，才可用 $\epsilon\approx\Phi(-\sqrt{\mathrm{SNR}})$；一般情况下直接统计测试误差，并预先规定零分数的分类规则。还应分别统计正类漏报和负类误报，以评价学习效率与特异性。
+第二项来自受体状态随接收者活动变化；它不能在求稳定性或响应时省略。若保留式（19）的 $\tau_s$，则 $s_i$ 是独立状态，需分析包含 $\mathbf y,\mathbf z_b,\mathbf s$ 的完整 Jacobian。
 
-固定网络规模和任务后，逐渐增大训练模式数 $P$，可定义满足测试误差不超过 $\epsilon_0$ 的最大负载 $P_{\max}$。这是一项给定读出规则下的性能指标，不等同于任意最优分类器的理论容量。
+### 8.2 神经响应与 KC→MBON 可塑性分开实现
 
-### 7.3 最优连接数必须带有预算与目标
+响应门控与学习门控是两条作用路径。改变 $R^{(b)}$ 只影响神经活动，KC→MBON 的 LTD 还需要独立学习方程。
 
-LK17 的一个关键比较固定输入突触预算 $S_{\mathrm{PN}}=MK$，因此改变 $K$ 时同时改变 $M=S_{\mathrm{PN}}/K$。加入递归后有两种不同约束：保持相同 PN 预算、另行报告递归成本；或把新增突触也纳入总预算。
-
-例如，可明确定义
+令局部胆碱能驱动为 $\ell_i=(B\mathbf z_b)_i$。一个有界的学习许可与资格迹实现为
 
 $$
-S_{\mathrm{total}}=
-c_{\mathrm{PN}}MK+c_E\operatorname{nnz}(E)
-+c_B\operatorname{nnz}(B)
-+c_A[\operatorname{nnz}(U)+\operatorname{nnz}(V)].
+p_i=1-\frac{s_i\ell_i}{\kappa+\ell_i},\quad \kappa>0,
+\qquad
+\tau_e\dot e_i=-e_i+\psi(y_i),
+\qquad
+\dot w_i=-\eta\,d(t)e_i p_i.
 \tag{22}
 $$
 
-$c$ 是所选的单位连接成本，$\operatorname{nnz}$ 计数非零连接。全局 APL 虽然消元后产生稠密的 $UV$，其物理通路在最简模型中只有约 $2M$ 条 KC↔APL 连接，不能按 $M^2$ 条直接 KC–KC 突触计费。
+$d(t)\ge0$ 表示诱导 LTD 的训练信号，$w_i$ 为 KC→MBON 权重，权重需限制在给定范围。$\psi(y_i)$ 及资格迹需根据任务设定。若本来就设 $e_i=0$ 于所有非活跃 KC，则“LTD 仅作用于活跃细胞”已由资格迹保证，不能再把该结果归因于开关。应测试弱活动、残余资格迹或相近气味所产生的非目标更新。
 
-在明确预算、活动水平和任务后，分别定义
+式（19）和式（22）采用现象学门控。分别消融响应门控与可塑性门控，测量各自对活动和权重更新的贡献。
+
+### 8.3 对应指标
+
+在群体稀疏度匹配条件下，比较固定 $s$、活动开关、去除 $B$ 三组。记录相似气味测试误差、CS+ 检出率和相近 CS− 假阳性率，并记录 LTD 泄漏：
 
 $$
-K_D^*=\operatorname*{argmax}_K D,
-\qquad
-K_{\epsilon}^*=\operatorname*{argmin}_K\epsilon,
-\qquad
-K_P^*=\operatorname*{argmax}_K P_{\max}.
+L_{\mathrm{off}}
+=\frac{\sum_{i\notin\mathcal S_{\mathrm{CS+}}}|\Delta w_i|}
+{\sum_i|\Delta w_i|},
+\quad \sum_i|\Delta w_i|>0.
 \tag{23}
 $$
 
-这些最优点未必相同。比较不同连接模式时，需要同时说明其余参数是固定、共同扫描，还是分别优化。
+目标是提高学习特异性，并保持所需敏感性；不能只报告 $D$ 增大。
 
-## 8. 从固定负耦合到活动门控与学习
+## 9. 扩展三：分区 APL 与状态调制
 
-固定的 $B$ 只能描述一种静态有效作用。为表达 mAChR-B 的电压依赖性 [3]，可以增加受体状态 $b_i\in[0,1]$：
+### 9.1 从一个平均通道到多个局部通道
+
+用局部平均算子构建低秩反馈。区室平均是秩一算子，保留区室内所有坐标的对角掩膜则通常是高秩。对互不重叠的理想 KC 分组，定义
 
 $$
-\tau_b\dot b_i=b_\infty(v_i)-b_i,
-\qquad
-b_\infty(v)=\frac1{1+\exp[(v-v_{1/2})/s_v]},
-\quad s_v>0.
+\mathbf u_c=\frac{\mathbf1_{\mathcal C_c}}{\sqrt{n_c}},
+\quad P_c=\mathbf u_c\mathbf u_c^\top,
+\quad R^{(\mathrm{APL})}=-\sum_c\alpha_cP_c
+=-U A U^\top,
+\quad A=\operatorname{diag}(\alpha_c).
 \tag{24}
 $$
 
-这里 $v_i$ 是接受调制的 KC 的膜电位，去极化使 $b_\infty$ 下降。sigmoid 形状、时间常数和参数属于待标定的现象学选择，式（24）不是文献的唯一模型。若只保留式（5）的有效输入 $u_i$，还需说明如何由它近似膜电位，不能直接把无量纲输入当作 mV。
+实际萼部、垂直叶和水平叶是解剖区室，同一个 KC 可参与多个区室，不能直接当成互斥 KC 分组。更合适的低秩表示是 $R^{(\mathrm{APL})}=-UA V$，其中 $V$ 汇集 KC 到各 APL 区室的活动，$U$ 将区室输出反馈到 KC；$\operatorname{rank}(UAV)\le C$。细胞级低秩模型仍可能不足以描述同一 KC 内不同部位的电位，必要时再引入多区室 KC。
 
-令 $\ell_i^{\mathrm{ACh}}=\sum_jB_{ij}r_j\ge0$ 近似来自其他 KC 的胆碱能驱动，可构造可塑性许可因子
+以 $\mathbf a$ 表示 APL 快活动，$\alpha_c$ 表示慢增益：
 
 $$
-p_i=1-b_i\frac{\ell_i^{\mathrm{ACh}}}{\kappa+\ell_i^{\mathrm{ACh}}},
-\qquad \kappa>0.
+\begin{aligned}
+\tau_K\dot{\mathbf y}&=-\mathbf y+
+\phi(W\mathbf x+g_aE\mathbf z_a-g_bSB\mathbf z_b-UA\mathbf a-\mathbf b),\\
+T_A\dot{\mathbf a}&=-\mathbf a+V\mathbf y.
+\end{aligned}
 \tag{25}
 $$
 
-当胆碱能驱动存在且受体活性较高时，$p_i$ 变小；接收 KC 去极化、$b_i$ 下降时，$p_i$ 增大。门控变量使用接收细胞的下标 $i$，输入求和使用发送细胞的下标 $j$。
+$T_A$ 是正时间常数对角矩阵。在快速 APL 极限 $\mathbf a=V\mathbf y$，恢复上述低秩反馈。有限区室间传播可加入明确的耦合项，并据局部刺激数据拟合；三个标量增益本身不能拟合连续空间的衰减长度。
 
-在只研究多巴胺诱导 LTD 的一个简化读出模型中，例如可以写
+对冻结的 $S,A$，令 $L=I-\gamma g_aE+\gamma g_bSB$，低秩逆矩阵可写为
 
 $$
-\tau_e\dot e_i=-e_i+r_i,
-\qquad
-\dot w_i^{\mathrm{out}}=-\eta\,d(t)e_i p_i,
+G=L^{-1}-\gamma L^{-1}UA
+\left(I_C+\gamma V L^{-1}UA\right)^{-1}VL^{-1}.
 \tag{26}
 $$
 
-其中 $e_i$ 是活动资格迹，$d(t)\ge0$ 表示该 LTD 通路的强化信号，并将权重限制在预先指定的范围内。受体门控因而可以限制噪声活动或残留资格迹导致的错误更新。这是展示“受体状态进入学习方程”的例子；它不替代完整的 cAMP 生化过程，也不覆盖所有多巴胺效应。
+这是 Woodbury 形式，要求相关矩阵可逆。它展示分区 APL 如何与树突及轴突连接相互作用，而不是先分别算完再把维度相加。
 
-式（20）的 Hebbian 分类器和式（26）的局部 LTD 读出是两种不同实验设定：前者用于固定规则下比较表征，后者用于检验学习门控。采用后者时，需重新训练并统计误报、漏报和训练次数，不能沿用前者的性能结果。
+### 9.2 SK 状态调制与训练调制
 
-若同时保留活动方程中的 $-g_BB\mathbf r$ 和学习方程中的门控，需要分别标定两者，避免重复计算同一受体作用。引入 $b_i,e_i$ 后，完整系统的状态变量增多；若还允许 $E,B$ 或 APL 权重学习，必须另给权重更新规则和边界，不能从静态协方差直接推出学习后的最优点。
+将 SK-AHP 对 APL 输出的影响表示为增益变化，可采用以下代理
 
-## 9. 与公式对应的数值比较流程
+$$
+\alpha_c(t)=\bar\alpha_c\,q_c(t)\,\zeta_c(t),
+\qquad q_c(t)=\frac{1}{1+\beta_c H_c(t)},
+\quad H_c\ge0,\ \beta_c>0.
+\tag{27}
+$$
 
-1. **固定输入与基础连接。** 为各模型使用相同的气味及试次噪声样本，固定 PN 数、输入预算与 $J^+$ 的生成规则。记录权重归一化。
-2. **分别定义比较模型。** 比较前馈、全局反馈、局部负耦合及联合模型；候选正耦合、APL 区室和受体门控作为单独明确的条件。由式（4）或式（5）产生响应。
-3. **先判定动力学状态。** 连续模型检查完整 Jacobian，并核对时间轨迹；二值异步模型检查状态是否停止改变，并从多个初值重复。持续振荡或多稳态结果单独记录，不当作唯一固定点。
-4. **在校准集上匹配活动水平。** 需要固定 $f$ 时重新调阈值，并重新求解整个递归网络。阈值和读出参数均不根据测试标签调整。
-5. **分别测量表征与任务指标。** 由样本响应得到 $f$、$C_{\mathrm{signal}}$、$C_{\mathrm{noise}}$、$D$、$d'$、误报、漏报和分类误差。用式（10）–（16）检验近似在哪些参数范围内可靠。
-6. **在稳定且预算一致的范围扫描。** 分别扫描 $K$、连接强度、APL 时间常数或门控参数，报告不同目标对应的最优点，并在多个网络抽样上给出变异范围。
+$H_c$ 是 AHP 强度代理，$\zeta_c$ 是训练造成的有效反馈变化。该代理保证 AHP 增强时增益下降，但不复现钙依赖钾通道的完整生物物理过程。
 
-这条分析链把连接矩阵、时间响应、协方差和学习表现逐项对应起来。连接的正负号决定方程中的作用方向，最终的表征与任务收益仍由网络结构、输入统计和读出共同决定。
+为了把训练去抑制与慢恢复区分，一种现象学更新是
+
+$$
+\dot\zeta_c=-\eta_A d_c(t)e_c(t)\zeta_c
++\frac{\zeta_{c,0}-\zeta_c}{\tau_{\mathrm{rec}}},
+\qquad 0\le\zeta_c\le\zeta_{\max}.
+\tag{28}
+$$
+
+式（28）把多巴胺调制折算为有效 APL 增益变化 [7]，属于实现假设，不代表 APL→KC 突触已被证明遵循该更新。增益变化幅度需要由响应数据拟合。
+
+对应比较包括局部刺激的反馈范围、SK 状态变化前后的稀疏度与相似气味误差、反转学习后的 CS+ 活动集合及读出权重变化。保持固定参数时观察整体状态表型，再用稀疏度匹配对照分离整体增益与空间结构的作用。
+
+## 10. 连接组合的非可加性
+
+冻结工作点增益，令 $R=R_1+\delta R_a+\delta R_b$。响应矩阵展开为
+
+$$
+G=G_1+\gamma G_1\delta R G_1
++\gamma^2G_1\delta R G_1\delta R G_1+\cdots.
+\tag{29}
+$$
+
+两种连接在二阶响应中产生
+
+$$
+\delta G_{ab}=\gamma^2\left(
+G_1\delta R_aG_1\delta R_bG_1
++G_1\delta R_bG_1\delta R_aG_1\right).
+\tag{30}
+$$
+
+矩阵一般不对易，因此两项都要保留。协方差还包含一阶响应乘积，维度又是协方差的非线性函数。固定活跃集合时，这些都可求导；活跃集合改变时，应与直接数值差分对照。
+
+对任意指标 $T$，定义可直接计算的联合交互量
+
+$$
+\mathcal I_{ab}^{T}=T_{ab}-T_a-T_b+T_0.
+\tag{31}
+$$
+
+以 $T=D$、误差、假阳性率分别计算。式（31）是在指定基线和对照协议下的交互，若各组重新调阈值，需注明它同时包含校准影响。交互量的符号由分析与模拟确定。
+
+## 11. 连接可塑性与最优工作点的移动
+
+### 11.1 轴突抑制的学习
+
+采用局部反 Hebbian 更新，推动共同波动较强的 KC 之间形成更强抑制 [8,9]。令 $B$ 的可塑权重为 $Q\ge0$，固定支持 $A^{(b)}$。一种针对中心化协方差的实现为
+
+$$
+\tau_\mu\dot\mu_i=-\mu_i+y_i,
+\qquad
+\dot Q_{ij}=\eta_b A^{(b)}_{ij}
+\left[(y_i-\mu_i)(y_j-\mu_j)-c_{ij}^{\mathrm{tar}}-\lambda_b Q_{ij}\right],
+\quad i\ne j,
+\tag{32}
+$$
+
+并将权重投影到 $[0,Q_{\max}]$。$R^{(b)}=-g_bQ$，正共同波动使 $Q$ 增强，即使递归权重更负；符号写反会使学习方向颠倒。原始活动乘积与中心化协方差对应不同目标，不能混用。
+
+式（32）是一个局部受约束更新，不等同于完整的 Földiák 或 Pehlevan–Chklovskii 优化算法，也不能保证任意稀疏、带受体门控的网络严格白化。用残余协方差谱和去相关误差测量白化程度。
+
+### 11.2 快慢时间尺度与最优点
+
+学习速度应明显慢于式（4）、式（16）、式（25）的神经动力学。在每个训练检查点冻结 $Q,\alpha_c$，测量稳定状态，再计算目标。
+
+$$
+K_D^*(t)=\arg\max_K D(K;Q(t),\boldsymbol\alpha(t)),
+\qquad
+K_{\epsilon}^*(t)=\arg\min_K\epsilon_{\mathrm{test}}(K;Q(t),\boldsymbol\alpha(t)).
+\tag{33}
+$$
+
+$K^*(t)$ 的变化首先表示不同网络配置的最优值移动，不能当成单个网络的 PN–KC 连线自动重接。若要让 $K$ 本身学习，必须另设结构可塑性规则。
+
+联合参数 $\boldsymbol\vartheta=(K,g_A,g_b,\rho_a,\alpha_c)$ 的最优点需限定任务、稳定域、编码条件和资源预算。分别定义维度、误差与容量的目标，构建相图，而不合并为一个未经定义的“最佳网络”。
+
+## 12. 指标与验证流程
+
+### 12.1 表征与任务指标
+
+| 指标 | 定义或估计 | 对应作用 |
+|---|---|---|
+| 稳定性与时间 | 完整 Jacobian 的最大特征值实部；响应峰值、衰减时间 | 排除发散或未达到稳态的配置，区分快慢机制 |
+| 稀疏度 | 二值输出 $f=N^{-1}\sum_i m_i$；发放率输出用预先规定的活动判据 | 区分全局增益变化与任务特异性变化 |
+| 维度与谱 | 式（12）或式（13）；式（14）；特征值分布 | 检验有限矩阵理论及均匀／残余近似 |
+| 白化偏离 | 对残余子空间的归一化协方差比较平坦谱与非对角相关 | 检验去相关预测；保留有效信号方向的任务对照 |
+| 判别与敏感性 | 独立测试集错误率、CS+ 检出率、CS− 假阳性率 | 开关的刺激特异性目标 |
+| 学习特异性 | 式（23）、训练后各 KC 权重变化 | 检验非目标 LTD 与可塑性门控 |
+| 泛化 | 沿预定义气味插值路径测量读出响应曲线或判定半径 | 区分保留同类泛化与排除相近不同类 |
+| 容量 | 满足预设测试误差标准的最大训练模式数，或明确定义的线性可分容量 | 比较不同任务负载；不以维度替代容量 |
+| 连接最优点 | 式（15）、式（33），附固定条件及预算 | 检验学习是否改变最优采样密度 |
+
+对相似气味，令训练后固定读出 $o=\mathbf w^\top\mathbf y+b_o$，可辅助计算
+
+$$
+d'^2=\frac{[\mathbf w^\top(\boldsymbol\mu_+-\boldsymbol\mu_-)]^2}
+{\tfrac12\mathbf w^\top(C_++C_-)\mathbf w}.
+\tag{34}
+$$
+
+$C_\pm$ 是对应气味的试次内噪声协方差，不能用跨气味表征协方差替代。读出必须在训练集拟合并固定，在独立噪声试次上测量。误差改善不能仅从 $D$ 增大推断。
+
+### 12.2 从核心模型开始的具体顺序
+
+1. **建立核心模型。** 实现式（4），保存网络矩阵、随机种子、归一化、阈值校准与输入统计。比较无反馈、APL、轴突抑制及二者组合；同时报告固定阈值和稀疏度匹配对照。
+2. **核验有限矩阵理论。** 比较式（9）–（13）与神经动力学模拟。扫描 $K,g_A,g_b$，记录稳定性和近似误差。首先使用实际抽样矩阵，不预先依赖自由概率或单一平均场公式。
+3. **检查通道分解。** 用式（14）与协方差谱确认均匀／残余近似的适用范围；若耦合显著，升级到低秩分区反馈。
+4. **逐个加入扩展。** 树突兴奋比较 M0/M1/M2；开关分别测试响应门控与学习门控；APL 分区分别测试空间结构、SK 状态与训练去抑制。
+5. **计算交互。** 采用两因素消融和式（31），先固定校准条件，再增加稀疏度匹配对照。报告效应量、网络抽样不确定性及任务表现。
+6. **加入慢学习。** 实现式（28）、式（32），冻结检查点，测量式（33）。扫描 $K$ 时，应对每个 $K$ 采用相同训练协议重新学习，或明确说明冻结了哪些权重。
+7. **连接组与生理检验。** 替换为实际矩阵，并分别检查连接支持、受体推断和参数尺度。以稀疏比例、局部反馈衰减与成像响应作为外部校准目标。
+8. **针对性脉冲验证。** 只对慢轴突门控及相似气味任务进行验证。发放率替换为脉冲列时，必须加入归一化突触滤波、处理单位和噪声，并重新校准；不能直接把 Dirac 脉冲列代入发放率方程后宣称参数完全不变。
 
 ## 参考文献
 
@@ -519,3 +570,7 @@ $$
 4. Amin H, et al. **Localized inhibition in the Drosophila mushroom body.** *eLife*, 2020, 9:e56954. [DOI](https://doi.org/10.7554/eLife.56954) · [全文及图片](https://pmc.ncbi.nlm.nih.gov/articles/PMC7541083/)。APL 的局部活动、反馈范围与连接结构。
 5. Chen CC, et al. **Sleep facilitates pattern separation through SK channel-mediated sparse coding.** *Current Biology*, 2026, 36:1633–1643.e6. [DOI](https://doi.org/10.1016/j.cub.2026.02.028) · [全文](https://pmc.ncbi.nlm.nih.gov/articles/PMC13075853/)。睡眠、SK 通道、APL 反馈与模式分离。
 6. Eichler K, et al. **The complete connectome of a learning and memory centre in an insect brain.** *Nature*, 2017, 548:175–182. [DOI](https://doi.org/10.1038/nature23455) · [全文](https://pmc.ncbi.nlm.nih.gov/articles/PMC5806122/)。幼虫 KC–KC 连接、APL 回路及其公开计算模型；发育阶段须与成蝇区分。
+
+7. Zhou M, et al. **Suppression of GABAergic neurons through D2-like receptor secures efficient conditioning in Drosophila aversive olfactory learning.** *PNAS*, 2019, 116:5118–5125. [DOI](https://doi.org/10.1073/pnas.1812342116)。多巴胺对 APL 的调制。
+8. Földiák P. **Forming sparse representations by local anti-Hebbian learning.** *Biological Cybernetics*, 1990, 64:165–170. [DOI](https://doi.org/10.1007/BF02331346)。局部反 Hebbian 学习。
+9. Pehlevan C, Chklovskii DB. **A normative theory of adaptive dimensionality reduction in neural networks.** *NeurIPS*, 2015. [论文](https://papers.neurips.cc/paper_files/paper/2015/hash/861dc9bd7f4e7dd3cccd534d0ae2a2e9-Abstract.html)。自适应降维与竞争学习框架。
