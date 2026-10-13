@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="650" viewBox="0 0 1000 650" role="img" aria-labelledby="title desc">
+<title id="title">KC 轴突侧向调制与 KC 到 MBON 的学习更新</title>
+<desc id="desc">KC A 释放乙酰胆碱，作用于 KC B 上的 mAChR-B。KC B 静息或弱活动时，受体抑制作用较强，限制学习更新；KC B 活跃并去极化时，受体抑制作用减弱，在气味与多巴胺配对时允许学习更新。</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#53657c"/></marker></defs>
+<rect width="1000" height="650" rx="20" fill="#f8fafc"/>
+<g font-family="Droid Sans Fallback,Microsoft YaHei,sans-serif" text-anchor="middle" fill="#192b42">
+<text x="500" y="51" font-size="29" font-weight="700">KC–KC 信号如何影响 KC→MBON 学习</text>
+<rect x="55" y="91" width="260" height="101" rx="14" fill="#e8effb" stroke="#658abd" stroke-width="2"/>
+<text x="185" y="132" font-size="26" font-weight="700">KC A 的轴突</text>
+<text x="185" y="168" font-size="21">释放乙酰胆碱（ACh）</text>
+<path d="M330 145 H475" stroke="#53657c" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="405" y="122" font-size="20">KC–KC 连接</text>
+<rect x="495" y="91" width="450" height="101" rx="14" fill="#e8effb" stroke="#658abd" stroke-width="2"/>
+<text x="720" y="132" font-size="26" font-weight="700">KC B 轴突上的 mAChR-B</text>
+<text x="720" y="168" font-size="21">接收 ACh，作用取决于 KC B 的电位</text>
+<text x="500" y="230" font-size="21" fill="#53657c">以下比较的是接收者 KC B 的两种状态</text>
+<rect x="40" y="251" width="440" height="313" rx="16" fill="#fff3ee" stroke="#d68a6a" stroke-width="2"/>
+<rect x="520" y="251" width="440" height="313" rx="16" fill="#eaf6f1" stroke="#559f86" stroke-width="2"/>
+<text x="260" y="294" font-size="25" font-weight="700">静息或弱活动</text>
+<text x="740" y="294" font-size="25" font-weight="700">活跃并去极化</text>
+<text x="260" y="344" font-size="24">mAChR-B 抑制作用较强</text>
+<text x="740" y="344" font-size="24">mAChR-B 抑制作用减弱</text>
+<path d="M260 365 V410" stroke="#53657c" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M740 365 V410" stroke="#53657c" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="260" y="455" font-size="24" font-weight="700">限制 KC B→MBON 的学习更新</text>
+<text x="260" y="497" font-size="21">减少无关气味的错误关联</text>
+<text x="740" y="450" font-size="24" font-weight="700">允许 KC B→MBON 学习更新</text>
+<text x="740" y="488" font-size="21">还需要气味与多巴胺信号配对</text>
+<text x="740" y="524" font-size="21">保留相关气味的学习</text>
+<text x="500" y="612" font-size="21" fill="#53657c">KC–KC 负责局部调制；学习改变的是 KC→MBON 突触强度。</text>
+</g></svg>
